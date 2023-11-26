@@ -5,6 +5,7 @@ export const COLORS = {
   labelGray: "#7b7b7b",
   black: "#292929",
   primary: "#007aff",
+  red: "#ff5252",
 };
 
 export const FONTS = {

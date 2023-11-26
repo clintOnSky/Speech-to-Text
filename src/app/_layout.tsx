@@ -6,10 +6,10 @@ import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  // Ensure any route can link back to `/`
-  initialRouteName: "(auth)",
-};
+// export const unstable_settings = {
+//   // Ensure any route can link back to `/`
+//   initialRouteName: "(auth)/signin",
+// };
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -33,13 +33,14 @@ export default function RootLayout() {
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <Stack
-        initialRouteName="(auth)"
         screenOptions={{
           headerShadowVisible: false,
         }}
       >
-        <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/signin" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)/signup" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
     </View>
   );

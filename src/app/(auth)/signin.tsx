@@ -18,27 +18,26 @@ import {
 } from "react-native-responsive-screen";
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
-import { router } from "expo-router";
+import { Stack, router } from "expo-router";
 
 const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-const SignUp = () => {
-  const { handleSubmit, control, reset, watch } = useForm();
-  const pwd = watch("password");
-
+const SignIn = () => {
+  const { control, handleSubmit } = useForm();
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
+        <Stack.Screen />
         <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
           <ImageBackground
             source={require("@img/bgImage.jpg")}
             style={styles.bgImage}
           >
-            <Text style={styles.header}>Sign Up!</Text>
+            <Text style={styles.header}>Sign In!</Text>
           </ImageBackground>
           <View style={styles.form}>
             <CustomInput
@@ -64,23 +63,17 @@ const SignUp = () => {
                 },
               }}
             />
-            <CustomInput
-              name="confirmPassword"
-              control={control}
-              rules={{
-                required: "Password is required",
-                validate: (value: string) =>
-                  value === pwd || "Password does not match",
-              }}
-            />
-            <CustomButton
-              title="Sign In"
-              onPress={handleSubmit(() => console.log("Pressed"))}
-            />
+            <TouchableOpacity style={styles.forgotPwdView}>
+              <Text style={styles.forgotPwd}>Forgot password?</Text>
+            </TouchableOpacity>
+
+            <CustomButton title="Sign In" onPress={handleSubmit(() => {})} />
             <View style={styles.signUpView}>
-              <Text style={styles.noAccountText}>Already have an account?</Text>
-              <TouchableOpacity onPress={() => router.back()}>
-                <Text style={styles.signUp}>Sign In</Text>
+              <Text style={styles.noAccountText}>
+                Don't have an account yet?
+              </Text>
+              <TouchableOpacity onPress={() => router.push("/signup")}>
+                <Text style={styles.signUp}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -90,7 +83,7 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignIn;
 
 const styles = StyleSheet.create({
   container: {
@@ -113,6 +106,10 @@ const styles = StyleSheet.create({
   },
   forgotPwdView: {
     alignSelf: "flex-end",
+  },
+  forgotPwd: {
+    ...globalStyles.fontSemiBold16,
+    color: COLORS.primary,
   },
   signUpView: {
     flexDirection: "row",

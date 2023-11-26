@@ -5,30 +5,43 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Controller } from "react-hook-form";
 import { COLORS } from "@const/index";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "global/styles";
 
 const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+
   return (
     <View>
       <Controller
         name={name}
         control={control}
-        rules={{}}
+        rules={rules}
         render={({
           field: { onChange, onBlur, value },
           fieldState: { error },
         }) => (
           <>
-            <View style={styles.inputView}>
+            <View
+              style={[
+                styles.inputView,
+                isFocused && { borderColor: COLORS.primary },
+              ]}
+            >
               <Ionicons
                 name={
                   name === "email"
                     ? "mail-outline"
-                    : name === "password"
+                    : name === "password" || "confirmPassword"
                     ? "lock-closed-outline"
                     : "person-outline"
                 }
@@ -40,23 +53,42 @@ const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
                   style={styles.input}
                   placeholder="Enter email"
                   placeholderTextColor={COLORS.gray}
-                  onBlur={onBlur}
+                  keyboardType="email-address"
+                  textContentType="emailAddress"
+                  onBlur={() => {
+                    setIsFocused(false);
+                    onBlur();
+                  }}
+                  onFocus={() => {
+                    setIsFocused(true);
+                  }}
                   onChangeText={onChange}
                   value={value}
                 />
-              ) : name === "password" ? (
+              ) : name === "password" || "confirmPassword" ? (
                 <>
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter password"
+                    placeholder={
+                      name === "password" ? "Enter password" : "Repeat password"
+                    }
                     placeholderTextColor={COLORS.gray}
-                    onBlur={onBlur}
+                    secureTextEntry={!isVisible}
+                    autoCapitalize="none"
+                    keyboardType={!isVisible ? "default" : "visible-password"}
+                    onBlur={() => {
+                      setIsFocused(false);
+                      onBlur();
+                    }}
+                    onFocus={() => {
+                      setIsFocused(true);
+                    }}
                     onChangeText={onChange}
                     value={value}
                   />
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={toggleVisibility}>
                     <Ionicons
-                      name="eye-outline"
+                      name={isVisible ? "md-eye-off-outline" : "md-eye-outline"}
                       size={24}
                       color={COLORS.gray}
                     />
@@ -67,13 +99,21 @@ const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
                   style={styles.input}
                   placeholder={placeholder}
                   placeholderTextColor={COLORS.gray}
-                  onBlur={onBlur}
+                  onBlur={() => {
+                    setIsFocused(false);
+                    onBlur();
+                  }}
+                  onFocus={() => {
+                    setIsFocused(true);
+                  }}
                   onChangeText={onChange}
                   value={value}
                 />
               )}
             </View>
-            <View>{error && <Text>{error.message}</Text>}</View>
+            <View style={{ marginTop: 3 }}>
+              {error && <Text style={styles.error}>{error.message}</Text>}
+            </View>
           </>
         )}
       />
@@ -92,12 +132,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 11,
     paddingVertical: 15,
-    marginBottom: 15,
     gap: 10,
   },
   input: {
     flex: 1,
-    ...globalStyles.fontBold16,
+    ...globalStyles.fontRegular16,
   },
-  error: {},
+  error: {
+    ...globalStyles.fontRegular14,
+    color: COLORS.red,
+  },
 });
