@@ -18,13 +18,14 @@ import {
 } from "react-native-responsive-screen";
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
-import { Stack, router } from "expo-router";
+import { Link, Stack, router } from "expo-router";
 
 const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const SignIn = () => {
   const { control, handleSubmit } = useForm();
+  console.log("Called");
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -42,7 +43,6 @@ const SignIn = () => {
           <View style={styles.form}>
             <CustomInput
               name="email"
-              placeholder="Enter email"
               control={control}
               rules={{
                 required: "Email is required",
@@ -63,18 +63,22 @@ const SignIn = () => {
                 },
               }}
             />
-            <TouchableOpacity style={styles.forgotPwdView}>
-              <Text style={styles.forgotPwd}>Forgot password?</Text>
-            </TouchableOpacity>
+            <Link href="/forgotPassword" asChild>
+              <TouchableOpacity style={styles.forgotPwdView}>
+                <Text style={styles.forgotPwd}>Forgot password?</Text>
+              </TouchableOpacity>
+            </Link>
 
             <CustomButton title="Sign In" onPress={handleSubmit(() => {})} />
             <View style={styles.signUpView}>
               <Text style={styles.noAccountText}>
                 Don't have an account yet?
               </Text>
-              <TouchableOpacity onPress={() => router.push("/signup")}>
-                <Text style={styles.signUp}>Sign Up</Text>
-              </TouchableOpacity>
+              <Link href="/signup" asChild>
+                <TouchableOpacity>
+                  <Text style={styles.signUp}>Sign Up</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
           </View>
         </ScrollView>

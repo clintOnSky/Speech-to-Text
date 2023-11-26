@@ -1,8 +1,10 @@
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { useCallback } from "react";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { COLORS } from "@const/index";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,11 +37,25 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShadowVisible: false,
+          statusBarStyle: "dark",
+          statusBarTranslucent: true,
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)/signin" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)/signup" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(auth)/forgotPassword"
+          options={{
+            title: "",
+            headerStyle: { backgroundColor: COLORS.light },
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => router.back()}>
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+            ),
+          }}
+        />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
     </View>

@@ -12,9 +12,7 @@ import { SIZES } from "@const/index";
 
 type CustomButtonProps = {
   title: string;
-  staticWidth?: string | number;
   onPress: () => void;
-  dynamicWidth?: DimensionValue;
 };
 
 const CustomButton = ({ title, onPress }: CustomButtonProps) => {
@@ -29,7 +27,6 @@ export default CustomButton;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingVertical: wp(SIZES.medium),
     alignItems: "center",
     justifyContent: "center",

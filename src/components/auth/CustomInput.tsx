@@ -49,6 +49,7 @@ const CustomInput = ({ name, control, rules = {}, label = "" }) => {
                   activeOutlineColor={error ? COLORS.red : COLORS.primary}
                   selectionColor={COLORS.primary}
                   outlineStyle={{ borderRadius: 10 }}
+                  autoCapitalize="none"
                   keyboardType="email-address"
                   textContentType="emailAddress"
                   onBlur={() => {
@@ -139,6 +140,7 @@ const styles = StyleSheet.create({
   },
   input: {
     ...globalStyles.fontRegular16,
+    backgroundColor: COLORS.light,
     flex: 1,
     paddingHorizontal: 30,
   },
