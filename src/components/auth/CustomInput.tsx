@@ -1,17 +1,12 @@
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { Controller } from "react-hook-form";
 import { COLORS } from "@const/index";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "global/styles";
+import { TextInput } from "react-native-paper";
 
-const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
+const CustomInput = ({ name, control, rules = {}, label = "" }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const [isVisible, setIsVisible] = useState(false);
@@ -31,28 +26,29 @@ const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
           fieldState: { error },
         }) => (
           <>
-            <View
-              style={[
-                styles.inputView,
-                isFocused && { borderColor: COLORS.primary },
-              ]}
-            >
-              <Ionicons
-                name={
-                  name === "email"
-                    ? "mail-outline"
-                    : name === "password" || "confirmPassword"
-                    ? "lock-closed-outline"
-                    : "person-outline"
-                }
-                size={24}
-                color={COLORS.primary}
-              />
+            <View style={styles.inputView}>
+              <View style={[styles.icon, { left: 0, marginLeft: 11 }]}>
+                <Ionicons
+                  name={
+                    name === "email"
+                      ? "mail-outline"
+                      : name === "password" || "confirmPassword"
+                      ? "lock-closed-outline"
+                      : "person-outline"
+                  }
+                  size={20}
+                  color={COLORS.primary}
+                />
+              </View>
               {name === "email" ? (
                 <TextInput
+                  mode="outlined"
+                  label="Email"
                   style={styles.input}
-                  placeholder="Enter email"
-                  placeholderTextColor={COLORS.gray}
+                  outlineColor={error ? COLORS.red : COLORS.gray}
+                  activeOutlineColor={error ? COLORS.red : COLORS.primary}
+                  selectionColor={COLORS.primary}
+                  outlineStyle={{ borderRadius: 10 }}
                   keyboardType="email-address"
                   textContentType="emailAddress"
                   onBlur={() => {
@@ -68,11 +64,15 @@ const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
               ) : name === "password" || "confirmPassword" ? (
                 <>
                   <TextInput
-                    style={styles.input}
-                    placeholder={
-                      name === "password" ? "Enter password" : "Repeat password"
+                    mode="outlined"
+                    label={
+                      name === "password" ? "Password" : "Confirm password"
                     }
-                    placeholderTextColor={COLORS.gray}
+                    style={styles.input}
+                    outlineColor={error ? COLORS.red : COLORS.gray}
+                    activeOutlineColor={error ? COLORS.red : COLORS.primary}
+                    selectionColor={COLORS.primary}
+                    outlineStyle={{ borderRadius: 10 }}
                     secureTextEntry={!isVisible}
                     autoCapitalize="none"
                     keyboardType={!isVisible ? "default" : "visible-password"}
@@ -86,19 +86,27 @@ const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
                     onChangeText={onChange}
                     value={value}
                   />
-                  <TouchableOpacity onPress={toggleVisibility}>
-                    <Ionicons
-                      name={isVisible ? "md-eye-off-outline" : "md-eye-outline"}
-                      size={24}
-                      color={COLORS.gray}
-                    />
-                  </TouchableOpacity>
+                  <View style={[styles.icon, { right: 0, marginRight: 11 }]}>
+                    <TouchableOpacity onPress={toggleVisibility}>
+                      <Ionicons
+                        name={
+                          isVisible ? "md-eye-off-outline" : "md-eye-outline"
+                        }
+                        size={20}
+                        color={COLORS.gray}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </>
               ) : (
                 <TextInput
+                  mode="outlined"
+                  label={label}
                   style={styles.input}
-                  placeholder={placeholder}
-                  placeholderTextColor={COLORS.gray}
+                  outlineColor={error ? COLORS.red : COLORS.gray}
+                  activeOutlineColor={error ? COLORS.red : COLORS.primary}
+                  selectionColor={COLORS.primary}
+                  outlineStyle={{ borderRadius: 10 }}
                   onBlur={() => {
                     setIsFocused(false);
                     onBlur();
@@ -111,6 +119,7 @@ const CustomInput = ({ name, control, rules = {}, placeholder = "" }) => {
                 />
               )}
             </View>
+
             <View style={{ marginTop: 3 }}>
               {error && <Text style={styles.error}>{error.message}</Text>}
             </View>
@@ -127,16 +136,18 @@ const styles = StyleSheet.create({
   inputView: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: 8,
-    paddingHorizontal: 11,
-    paddingVertical: 15,
-    gap: 10,
   },
   input: {
-    flex: 1,
     ...globalStyles.fontRegular16,
+    flex: 1,
+    paddingHorizontal: 30,
+  },
+  icon: {
+    position: "absolute",
+    zIndex: 1,
+    top: 6,
+    bottom: 0,
+    justifyContent: "center",
   },
   error: {
     ...globalStyles.fontRegular14,

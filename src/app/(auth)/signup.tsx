@@ -43,13 +43,12 @@ const SignUp = () => {
           <View style={styles.form}>
             <CustomInput
               name="email"
-              placeholder="Enter email"
               control={control}
               rules={{
                 required: "Email is required",
                 pattern: {
                   value: EMAIL_REGEX,
-                  message: "Email or Phone number is invalid",
+                  message: "Email is invalid",
                 },
               }}
             />
@@ -74,7 +73,7 @@ const SignUp = () => {
               }}
             />
             <CustomButton
-              title="Sign In"
+              title="Sign Up"
               onPress={handleSubmit(() => console.log("Pressed"))}
             />
             <View style={styles.signUpView}>

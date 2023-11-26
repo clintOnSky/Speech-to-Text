@@ -48,7 +48,7 @@ const SignIn = () => {
                 required: "Email is required",
                 pattern: {
                   value: EMAIL_REGEX,
-                  message: "Email or Phone number is invalid",
+                  message: "Email is invalid",
                 },
               }}
             />
