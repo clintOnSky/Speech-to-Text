@@ -5,7 +5,8 @@
       "@/*": ["src/*"],
       "@comp/*": ["src/components/*"],
       "@const/*": ["constants/*"],
-      "@img/*": ["assets/images/*"]
+      "@img/*": ["assets/images/*"],
+      "@assets/*": ["assets/*"]
     }
   },
   "extends": "expo/tsconfig.base",
