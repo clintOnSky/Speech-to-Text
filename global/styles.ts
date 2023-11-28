@@ -53,6 +53,11 @@ export const globalStyles = StyleSheet.create({
     fontSize: wp(SIZES.medium2),
     color: COLORS.black,
   },
+  fontSemiBold36: {
+    fontFamily: FONTS.semiBold,
+    fontSize: wp(SIZES.extraLarge),
+    color: COLORS.black,
+  },
   fontBold14: {
     fontFamily: FONTS.bold,
     fontSize: wp(SIZES.small),

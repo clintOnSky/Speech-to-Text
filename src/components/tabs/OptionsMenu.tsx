@@ -8,9 +8,8 @@ import { MenuProps } from "types";
 
 interface OptionsMenuProps {
   data: MenuProps[];
-  hideMenu: () => void;
 }
-const OptionsMenu = ({ data, hideMenu }: OptionsMenuProps) => {
+const OptionsMenu = ({ data }: OptionsMenuProps) => {
   return (
     <FlatList
       data={data}
@@ -19,8 +18,7 @@ const OptionsMenu = ({ data, hideMenu }: OptionsMenuProps) => {
           style={styles.button}
           key={index.toString()}
           onPress={() => {
-            item.handleMenuPress;
-            hideMenu();
+            item.handleMenuPress();
           }}
         >
           <Ionicons

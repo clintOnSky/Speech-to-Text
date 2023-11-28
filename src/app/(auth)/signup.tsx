@@ -72,10 +72,12 @@ const SignUp = () => {
                   value === pwd || "Password does not match",
               }}
             />
-            <CustomButton
-              title="Sign Up"
-              onPress={handleSubmit(() => console.log("Pressed"))}
-            />
+            <View style={{ alignItems: "center" }}>
+              <CustomButton
+                title="Sign Up"
+                onPress={handleSubmit(() => console.log("Pressed"))}
+              />
+            </View>
             <View style={styles.signUpView}>
               <Text style={styles.noAccountText}>Already have an account?</Text>
               <TouchableOpacity onPress={() => router.back()}>

@@ -6,13 +6,17 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState, useRef, FC, useCallback } from "react";
+import React, { useState, useRef, FC, useCallback, useContext } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { COLORS, SIZES } from "@const/index";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
 import { MenuProps, PositionProps, RecordCardProps } from "types";
 import OptionsMenu from "./OptionsMenu";
+import { RecordContext } from "@/app/(tabs)/record";
 
 type RecordItemProps = {
   recordData: RecordCardProps;
@@ -22,25 +26,33 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState<PositionProps | null>(null);
 
+  // const { onDelete } = useContext(RecordContext);
+
   const touchableRef = useRef<TouchableOpacity>(null);
 
-  const menuData: MenuProps[] = [
-    { title: "Rename", handleMenuPress: () => {} },
-    { title: "Share", handleMenuPress: () => {} },
-    { title: "Delete", handleMenuPress: () => {} },
-  ];
+  const handleDelete = () => {
+    hideMenu();
+    // onDelete(recordData);
+  };
 
   function hideMenu() {
     setIsVisible(false);
-    console.log("Hide menu");
   }
+
+  const menuData: MenuProps[] = [
+    { title: "Rename", handleMenuPress: hideMenu },
+    { title: "Share", handleMenuPress: hideMenu },
+    { title: "Delete", handleMenuPress: handleDelete },
+  ];
 
   const showMenu = useCallback(() => {
     touchableRef?.current?.measureInWindow((x, y, width, height) => {
-      setMenuPosition({ top: y + height, left: x - 85 });
-      console.log(menuPosition);
+      if (y + height > hp(70)) {
+        setMenuPosition({ top: hp(70), left: x - 85 });
+      } else {
+        setMenuPosition({ top: y + height, left: x - 85 });
+      }
       setIsVisible(true);
-      console.log("handle TouchableRef pressed");
     });
   }, [touchableRef]);
 
@@ -72,10 +84,10 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
       </View>
       {/* Options Menu */}
       <Modal transparent={true} visible={isVisible} onRequestClose={hideMenu}>
-        <TouchableWithoutFeedback onPress={hideMenu}>
+        <TouchableWithoutFeedback onPressIn={hideMenu}>
           <View style={styles.modal}>
             <View style={[styles.optionMenu, menuPosition && menuPosition]}>
-              <OptionsMenu data={menuData} hideMenu={hideMenu} />
+              <OptionsMenu data={menuData} />
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -99,7 +111,7 @@ const styles = StyleSheet.create({
   },
   soundIcon: {
     padding: 15,
-    backgroundColor: COLORS.lightBlue,
+    backgroundColor: COLORS.lightBrown,
     borderRadius: 8,
   },
   title: {

@@ -18,7 +18,7 @@ import {
 } from "react-native-responsive-screen";
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
-import { Link, Stack, router } from "expo-router";
+import { Link, Stack } from "expo-router";
 
 const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -68,8 +68,9 @@ const SignIn = () => {
                 <Text style={styles.forgotPwd}>Forgot password?</Text>
               </TouchableOpacity>
             </Link>
-
-            <CustomButton title="Sign In" onPress={handleSubmit(() => {})} />
+            <View style={{ alignItems: "center" }}>
+              <CustomButton title="Sign In" onPress={handleSubmit(() => {})} />
+            </View>
             <View style={styles.signUpView}>
               <Text style={styles.noAccountText}>
                 Don't have an account yet?

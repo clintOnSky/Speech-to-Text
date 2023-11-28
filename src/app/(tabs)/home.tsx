@@ -9,10 +9,7 @@ import React from "react";
 import { globalStyles } from "global/styles";
 import { COLORS, SIZES } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Tabs } from "expo-router";
 
 const Home = () => {
@@ -24,7 +21,7 @@ const Home = () => {
             header: () => (
               <View style={styles.header}>
                 <Text style={styles.welcome}>
-                  Welcome <Text style={styles.firstName}>SkyLord</Text>
+                  Welcome <Text style={styles.firstName}>Clinton</Text>
                 </Text>
                 <Text style={styles.remainingText}>
                   Remaining Minutes:{" "}
@@ -53,7 +50,7 @@ const Home = () => {
               />
             </View>
             <View style={{ gap: 5 }}>
-              <Text style={styles.buttonTitle}>Pick a file</Text>
+              <Text style={styles.buttonTitle}>Pick an audio file</Text>
               <Text style={styles.buttonDesc}>and Transcribe</Text>
             </View>
           </TouchableOpacity>
@@ -97,6 +94,7 @@ const styles = StyleSheet.create({
     gap: 15,
     justifyContent: "center",
     paddingHorizontal: wp(SIZES.medium),
+    elevation: 10,
   },
   button: {
     flexDirection: "row",
@@ -108,13 +106,14 @@ const styles = StyleSheet.create({
   },
   icon: {
     padding: 10,
-    backgroundColor: COLORS.lightBlue,
+    backgroundColor: COLORS.lightBrown,
     borderRadius: 30,
   },
   buttonTitle: {
     ...globalStyles.fontBold16,
   },
   buttonDesc: {
-    ...globalStyles.fontRegular14,
+    ...globalStyles.fontSemiBold14,
+    color: COLORS.primary,
   },
 });
