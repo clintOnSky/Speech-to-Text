@@ -5,7 +5,7 @@ import { COLORS, FONTS, SIZES } from "@const/index";
 import { globalStyles } from "global/styles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
-export default function () {
+export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
@@ -23,6 +23,10 @@ export default function () {
           fontSize: wp(SIZES.verySmall),
         },
         headerStyle: { backgroundColor: COLORS.light },
+        headerShadowVisible: false,
+        headerTitleStyle: {
+          ...globalStyles.fontBold20,
+        },
       }}
       tabBar={(props) => <CustomBottomTab {...props} />}
     >
@@ -38,9 +42,6 @@ export default function () {
         name="record"
         options={{
           title: "Recordings",
-          headerTitleStyle: {
-            ...globalStyles.fontBold20,
-          },
           tabBarIcon: ({ size, color }) => (
             <Ionicons name={"mic-outline"} size={size} color={color} />
           ),
@@ -50,9 +51,6 @@ export default function () {
         name="transcript"
         options={{
           title: "Transcripts",
-          headerTitleStyle: {
-            ...globalStyles.fontBold20,
-          },
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="reader-outline" size={size} color={color} />
           ),
@@ -61,6 +59,7 @@ export default function () {
       <Tabs.Screen
         name="settings"
         options={{
+          title: "Settings",
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
           ),

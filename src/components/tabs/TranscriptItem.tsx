@@ -6,7 +6,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState, useRef, FC, useCallback, useContext } from "react";
+import React, { useState, useRef, FC, useCallback } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { COLORS, SIZES } from "@const/index";
 import {
@@ -16,12 +16,13 @@ import {
 import { globalStyles } from "global/styles";
 import { MenuProps, PositionProps, RecordCardProps } from "types";
 import OptionsMenu from "./OptionsMenu";
+import { router } from "expo-router";
 
 type RecordItemProps = {
   recordData: RecordCardProps;
 };
 
-const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
+const TranscriptItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState<PositionProps | null>(null);
 
@@ -57,10 +58,17 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
 
   return (
     <>
-      {/* Record Card */}
-      <View style={styles.container}>
-        <View style={styles.soundIcon}>
-          <Ionicons name="recording-sharp" size={24} color={COLORS.primary} />
+      {/* Transcription Card */}
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() => router.push(`/${recordData.title}`)}
+      >
+        <View style={styles.transcriptIcon}>
+          <Ionicons
+            name="document-text-outline"
+            size={24}
+            color={COLORS.primary}
+          />
         </View>
         <View style={{ flex: 1, gap: 5, justifyContent: "center" }}>
           <Text style={styles.title} numberOfLines={1}>
@@ -70,9 +78,6 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
             25-11-2023 <Text>15:11</Text>
           </Text>
         </View>
-        <TouchableOpacity>
-          <Ionicons name="play" size={26} color={COLORS.primary} />
-        </TouchableOpacity>
         <TouchableOpacity
           onPress={showMenu}
           style={{ paddingVertical: 5 }}
@@ -80,7 +85,7 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
         >
           <Ionicons name="ellipsis-vertical" size={24} color={COLORS.gray} />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
       {/* Options Menu */}
       <Modal transparent={true} visible={isVisible} onRequestClose={hideMenu}>
         <TouchableWithoutFeedback onPressIn={hideMenu}>
@@ -95,7 +100,7 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
   );
 };
 
-export default RecordItem;
+export default TranscriptItem;
 
 const styles = StyleSheet.create({
   container: {
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 1,
   },
-  soundIcon: {
+  transcriptIcon: {
     padding: 15,
     backgroundColor: COLORS.lightBrown,
     borderRadius: 8,

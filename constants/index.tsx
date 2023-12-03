@@ -6,9 +6,11 @@ export const COLORS = {
   black: "#292929",
   // primary: "#007aff",
   primary: "#d7bf78",
+  // primary: "#7968d8",
   lightBlue: "#cce4ff",
   lightGreen: "rgba(0, 192, 169, 0.2)",
   lightBrown: "rgba(215, 191, 120, 0.2)",
+  lightPurple: "rgba(121, 104, 218, 0.2)",
   red: "#ff5252",
 };
 

@@ -57,6 +57,8 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        <Stack.Screen name="(stack)/[id]" options={{}} />
       </Stack>
     </View>
   );

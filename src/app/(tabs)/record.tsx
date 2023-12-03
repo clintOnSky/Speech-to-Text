@@ -25,11 +25,6 @@ const Record = () => {
     setIsRecorderVisible(false);
   };
 
-  const renderItem: ListRenderItem<RecordDataItem> = useCallback(
-    ({ item }) => <RecordItem recordData={item} />,
-    [data]
-  );
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -39,7 +34,7 @@ const Record = () => {
           gap: 15,
           paddingBottom: 150,
         }}
-        renderItem={renderItem}
+        renderItem={({ item }) => <RecordItem recordData={item} />}
       />
 
       <View
