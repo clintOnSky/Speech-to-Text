@@ -8,6 +8,8 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Audio } from "expo-av";
 import { PermissionResponse, Recording, Sound } from "expo-av/build/Audio";
 import { useFocusEffect } from "expo-router";
+import * as FileSystem from "expo-file-system";
+import { shareAsync } from "expo-sharing";
 
 interface AudioRecorderProps {
   isVisible: boolean;
@@ -35,20 +37,20 @@ const AudioRecorder = ({ isVisible, hideRecorder }: AudioRecorderProps) => {
     clearStates();
   }, [isVisible]);
 
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+  // useEffect(() => {
+  //   let intervalId: NodeJS.Timeout;
 
-    if (isRecording === true && recording) {
-      intervalId = setInterval(() => {
-        setTimer((prevTimer) => prevTimer + 1);
-        // Stop recording if timer exceeds time limit
-        if (timer === 10 * 60 * 60 - 1) {
-          stopRecording();
-        }
-      }, 1000);
-    }
-    return () => clearInterval(intervalId);
-  });
+  //   if (isRecording === true && recording) {
+  //     intervalId = setInterval(() => {
+  //       setTimer((prevTimer) => prevTimer + 1);
+  //       // Stop recording if timer exceeds time limit
+  //       if (timer === 10 * 60 * 60 - 1) {
+  //         stopRecording();
+  //       }
+  //     }, 1000);
+  //   }
+  //   return () => clearInterval(intervalId);
+  // });
 
   async function startRecording() {
     try {
@@ -65,7 +67,10 @@ const AudioRecorder = ({ isVisible, hideRecorder }: AudioRecorderProps) => {
 
         console.log("Starting recording..");
         const { recording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY
+          Audio.RecordingOptionsPresets.HIGH_QUALITY,
+          (status) => {
+            setTimer(status.durationMillis / 1000);
+          }
         );
 
         setRecording(recording);
@@ -97,6 +102,38 @@ const AudioRecorder = ({ isVisible, hideRecorder }: AudioRecorderProps) => {
     setIsRecording(record.isRecording);
   }
 
+  const saveAudio = async (uri: string, fileName: string, mimeType: string) => {
+    //Requests permission to access folders on android
+    const permission =
+      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+    if (permission.granted) {
+      // Creates a new copy of the file at the uri provided as a base64 string
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: "base64",
+      });
+
+      // Creates an empty file at selected folder directory
+      FileSystem.StorageAccessFramework.createFileAsync(
+        permission.directoryUri,
+        fileName,
+        mimeType
+      )
+        .then(async (uri) => {
+          console.log(uri);
+          // Then copies the value
+          await FileSystem.writeAsStringAsync(uri, base64, {
+            encoding: "base64",
+          });
+        })
+        .catch((e) => {
+          console.warn(e);
+        });
+    } else {
+      shareAsync(uri);
+    }
+  };
+
   async function stopRecording() {
     console.log("Stopping recording..");
     setRecording(undefined);
@@ -107,11 +144,16 @@ const AudioRecorder = ({ isVisible, hideRecorder }: AudioRecorderProps) => {
     });
 
     const { sound, status } = await recording.createNewLoadedSoundAsync();
+    console.log(
+      "🚀 ~ file: AudioRecorder.tsx:141 ~ stopRecording ~ status:",
+      status
+    );
 
     setSound(sound);
 
     const uri = recording.getURI();
 
+    saveAudio(uri, "Recording.m4a", "audio/mp4");
     console.log("Recording stopped and stored at", uri);
   }
 
