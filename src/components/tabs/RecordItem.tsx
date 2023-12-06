@@ -6,7 +6,14 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState, useRef, FC, useCallback, useContext } from "react";
+import React, {
+  useState,
+  useRef,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+} from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { COLORS, SIZES } from "@const/index";
 import {
@@ -15,36 +22,64 @@ import {
 } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
 import { MenuProps, PositionProps, RecordCardProps } from "types";
-import OptionsMenu from "./OptionsMenu";
+import { Audio } from "expo-av";
+import { pause, play, resume } from "@utils/playbackFunc";
+import { PlaybackContext } from "@context/playbackContext";
+import { getDateTime, getDuration } from "@utils/recordingFunc";
 
 type RecordItemProps = {
   recordData: RecordCardProps;
+  setMenuPosition: (data: PositionProps | null) => void;
+  setIsVisible: (value: boolean) => void;
+  setSelectedRecord: (data: RecordCardProps) => void;
 };
 
-const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<PositionProps | null>(null);
+const RecordItem: FC<RecordItemProps> = ({
+  recordData,
+  setMenuPosition,
+  setIsVisible,
+  setSelectedRecord,
+}) => {
+  const {
+    sound,
+    setSound,
+    playbackStatus,
+    setPlaybackStatus,
+    currentURI,
+    setCurrentURI,
+  } = useContext(PlaybackContext);
 
-  // const { onDelete } = useContext(RecordContext);
+  const { date, time } = getDateTime(recordData.createdAt);
 
   const touchableRef = useRef<TouchableOpacity>(null);
 
-  const handleDelete = () => {
-    hideMenu();
-    // onDelete(recordData);
-  };
-
-  function hideMenu() {
-    setIsVisible(false);
-  }
-
-  const menuData: MenuProps[] = [
-    { title: "Rename", handleMenuPress: hideMenu },
-    { title: "Share", handleMenuPress: hideMenu },
-    { title: "Delete", handleMenuPress: handleDelete },
-  ];
+  const handleAudio = useCallback(async () => {
+    setCurrentURI(recordData.uri);
+    try {
+      if (sound === null || currentURI !== recordData.uri) {
+        currentURI !== recordData.uri && (await sound?.unloadAsync());
+        const playbackObj = new Audio.Sound();
+        const status = await play(playbackObj, recordData.uri);
+        setSound(playbackObj);
+        setPlaybackStatus(status);
+      } else if (
+        playbackStatus.isLoaded &&
+        playbackStatus.isPlaying &&
+        currentURI === recordData.uri
+      ) {
+        const status = await pause(sound);
+        setPlaybackStatus(status);
+      } else if (playbackStatus.isLoaded && !playbackStatus.isPlaying) {
+        const status = await resume(sound);
+        setPlaybackStatus(status);
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  }, [playbackStatus, sound]);
 
   const showMenu = useCallback(() => {
+    setSelectedRecord(recordData);
     touchableRef?.current?.measureInWindow((x, y, width, height) => {
       if (y + height > hp(70)) {
         setMenuPosition({ top: hp(70), left: x - 85 });
@@ -66,12 +101,27 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
           <Text style={styles.title} numberOfLines={1}>
             {recordData.title}
           </Text>
-          <Text style={styles.date} numberOfLines={1}>
-            25-11-2023 <Text>15:11</Text>
-          </Text>
+          <View style={styles.timeView}>
+            <Text style={styles.date} numberOfLines={1}>
+              {date} {time}
+            </Text>
+            <Text style={[styles.date, { marginRight: 10 }]}>
+              {getDuration(recordData.duration)}
+            </Text>
+          </View>
         </View>
-        <TouchableOpacity>
-          <Ionicons name="play" size={26} color={COLORS.primary} />
+        <TouchableOpacity onPress={handleAudio}>
+          <Ionicons
+            name={
+              playbackStatus?.isLoaded &&
+              playbackStatus?.isPlaying &&
+              currentURI === recordData.uri
+                ? "pause"
+                : "play"
+            }
+            size={26}
+            color={COLORS.primary}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={showMenu}
@@ -81,16 +131,6 @@ const RecordItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
           <Ionicons name="ellipsis-vertical" size={24} color={COLORS.gray} />
         </TouchableOpacity>
       </View>
-      {/* Options Menu */}
-      <Modal transparent={true} visible={isVisible} onRequestClose={hideMenu}>
-        <TouchableWithoutFeedback onPressIn={hideMenu}>
-          <View style={styles.modal}>
-            <View style={[styles.optionMenu, menuPosition && menuPosition]}>
-              <OptionsMenu data={menuData} />
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
     </>
   );
 };
@@ -115,21 +155,15 @@ const styles = StyleSheet.create({
   },
   title: {
     ...globalStyles.fontMedium16,
+    marginRight: 15,
+  },
+  timeView: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   date: {
     ...globalStyles.fontRegular14,
     color: COLORS.labelGray,
-  },
-  modal: {
-    flex: 1,
-    // backgroundColor: "rgba(0,0,0,0.1)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  optionMenu: {
-    position: "absolute",
-    backgroundColor: COLORS.white,
-    elevation: 10,
-    borderRadius: 8,
   },
 });

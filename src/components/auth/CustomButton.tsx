@@ -1,9 +1,4 @@
-import {
-  Text,
-  TouchableOpacity,
-  DimensionValue,
-  StyleSheet,
-} from "react-native";
+import { Text, TouchableOpacity, StyleSheet } from "react-native";
 import React, { FC, ReactNode } from "react";
 import { COLORS } from "@const/index";
 import { globalStyles } from "global/styles";
@@ -30,7 +25,7 @@ export default CustomButton;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    gap: 15,
+    gap: 5,
     width: wp(80),
     paddingVertical: wp(SIZES.medium),
     alignItems: "center",

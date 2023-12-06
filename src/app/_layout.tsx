@@ -22,6 +22,7 @@ export default function RootLayout() {
     nunitoExtraBold: require("assets/fonts/Nunito-ExtraBold.ttf"),
     nunitoBlack: require("assets/fonts/Nunito-Black.ttf"),
   });
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
       await SplashScreen.hideAsync();
