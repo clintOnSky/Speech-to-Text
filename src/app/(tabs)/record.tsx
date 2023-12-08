@@ -29,12 +29,20 @@ import {
 } from "types";
 import OptionsMenu from "@/components/tabs/OptionsMenu";
 import { shareAsync } from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+import RecorderPreview from "@/components/tabs/RecorderPreview";
 
 const Record = () => {
   const { db } = useContext(DatabaseContext);
 
-  const { recordings, setRecordings, showRecorder, deleteAudio, renameAudio } =
-    useContext(RecordingContext);
+  const {
+    recordings,
+    setRecordings,
+    showRecorder,
+    deleteAudio,
+    renameAudio,
+    recordPreview,
+  } = useContext(RecordingContext);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -53,7 +61,7 @@ const Record = () => {
     setMenuPosition(data);
   };
 
-  const handleMenuVisibility = (value) => {
+  const handleMenuVisibility = (value: boolean) => {
     setIsMenuVisible(value);
   };
 
@@ -81,6 +89,7 @@ const Record = () => {
   const handleRename = () => {
     setIsModalVisible(false);
     renameAudio(selectedRecord.id, title);
+    setSelectedRecord(null);
   };
 
   const handleSelectedRecord = (recordData: RecordDataItem) => {
@@ -96,6 +105,8 @@ const Record = () => {
   const shareAudio = async () => {
     try {
       await shareAsync(selectedRecord.uri);
+
+      console.log("File copied successfully");
     } catch (e) {
       console.log("Error occured while sharing", e);
     }
@@ -134,7 +145,7 @@ const Record = () => {
     });
 
     setIsLoading(false);
-  }, [recordings]);
+  }, [selectedRecord]);
 
   // useEffect(() => {
   //   db.transaction((tx) => {
@@ -156,9 +167,6 @@ const Record = () => {
   useEffect(() => {
     // Focus the input and set the selection to the end when the component mounts
     textInputRef.current?.focus();
-
-    // Select all text when the component mounts
-    textInputRef.current?.setNativeProps({ start: 0, end: -1 });
   }, []);
 
   return (
@@ -259,6 +267,7 @@ const Record = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+      {recordPreview && <RecorderPreview />}
     </View>
   );
 };
@@ -330,7 +339,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
-    padding: 8,
+    paddingVertical: 12,
   },
   cancelText: {
     ...globalStyles.fontMedium16,
@@ -342,7 +351,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
-    padding: 8,
+    paddingVertical: 12,
   },
   okText: {
     ...globalStyles.fontMedium16,

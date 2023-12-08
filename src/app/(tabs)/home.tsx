@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 15,
     borderRadius: 15,
+    elevation: 1,
   },
   icon: {
     padding: 10,

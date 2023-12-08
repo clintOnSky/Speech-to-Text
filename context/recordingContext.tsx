@@ -6,7 +6,6 @@ import { PermissionResponse, Recording } from "expo-av/build/Audio";
 import { Audio } from "expo-av";
 import { getCurrentISOString } from "@utils/index";
 import * as FileSystem from "expo-file-system";
-import { shareAsync } from "expo-sharing";
 import { RecordDataItem, RecordingContextProps } from "types";
 import uuid from "react-native-uuid";
 
@@ -19,29 +18,56 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Stores actual recorded audio
   const [recording, setRecording] = useState<Recording | undefined>();
+  const [recordings, setRecordings] = useState<RecordDataItem[]>(null);
   const [isRecording, setIsRecording] = useState(true);
+
+  // The playback time of recorded audio
   const [timer, setTimer] = useState<number>(0);
 
-  const [recordings, setRecordings] = useState<RecordDataItem[]>(null);
+  // State of audio recorder
+  const [isRecorderVisible, setIsRecorderVisible] = useState(false);
 
-  const [isVisible, setIsVisible] = useState(false);
+  // State of transcribe modal
+  const [isTransModalVisible, setIsTransModalVisible] = useState(false);
 
-  const { sound, setSound } = useContext(PlaybackContext);
+  // State of stored audio preview
+  const [recordPreview, setRecordPreview] = useState<RecordDataItem>(null);
+
+  const { setSound } = useContext(PlaybackContext);
 
   const showRecorder = () => {
-    setIsVisible(true);
+    setIsRecorderVisible(true);
   };
   const hideRecorder = () => {
-    setIsVisible(false);
+    setIsRecorderVisible(false);
   };
 
-  function clearStates() {
+  const showTransModal = () => {
+    setIsTransModalVisible(true);
+  };
+
+  const hideTransModal = () => {
+    setRecordPreview(null);
+    setIsTransModalVisible(false);
+  };
+
+  async function clearStates() {
     console.log("Unloading recording");
     setSound(undefined);
     setRecording(undefined);
     setIsRecording(true);
     setTimer(0);
+    setRecording(undefined);
+    if (recording) {
+      console.log("Stopping recording..");
+
+      await recording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+      });
+    }
   }
+  // console.log("Called recordingContext");
 
   async function startRecording() {
     try {
@@ -56,18 +82,15 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
           playsInSilentModeIOS: true,
         });
 
-        console.log("Starting recording..");
         const { recording } = await Audio.Recording.createAsync(
           Audio.RecordingOptionsPresets.HIGH_QUALITY,
           (status) => {
-            console.log("updating milliseconds");
             setTimer(status.durationMillis);
           }
         );
 
         setRecording(recording);
         setIsRecording(true);
-        console.log("Recording started");
       } else {
         alert("Microphone permission access was denied");
       }
@@ -78,9 +101,9 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   async function pauseRecording() {
     console.log("Pausing recording..");
-    const record = await recording.pauseAsync();
+    const status = await recording.pauseAsync();
 
-    setIsRecording(record.isRecording);
+    setIsRecording(status.isRecording);
   }
 
   async function resumeRecording() {
@@ -97,54 +120,44 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
       allowsRecordingIOS: false,
     });
 
-    const { sound, status } = await recording.createNewLoadedSoundAsync();
-    console.log(
-      "🚀 ~ file: AudioRecorder.tsx:141 ~ stopRecording ~ status:",
-      status
-    );
+    const { sound } = await recording.createNewLoadedSoundAsync();
 
     setSound(sound);
 
     const fileName = "AUD" + getCurrentISOString().replace(/[-T:Z.]/g, "");
 
-    // setTimer(status?.isLoaded && status.durationMillis)
-
     const uri = recording.getURI();
 
-    saveAudio(uri, fileName, "audio/mp4");
+    saveAudio(uri, fileName);
   }
 
-  const saveAudio = async (uri: string, fileName: string, mimeType: string) => {
-    //Requests permission to access folders on android
-    const permission =
-      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+  const saveAudio = async (uri: string, fileName: string) => {
+    try {
+      const internalDir = FileSystem.documentDirectory + "audio/";
 
-    if (permission.granted) {
-      // Creates a new copy of the file at the uri provided as a base64 string
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: "base64",
+      const fileDirInfo = await FileSystem.getInfoAsync(internalDir);
+
+      if (!fileDirInfo.exists) {
+        await FileSystem.makeDirectoryAsync(internalDir, {
+          intermediates: true,
+        });
+      }
+
+      // Define the destination URI in internal storage
+      const internalFileUri = `${internalDir}${fileName}.m4a`;
+
+      await FileSystem.moveAsync({
+        from: uri,
+        to: internalFileUri,
       });
 
-      // Creates an empty file at selected folder directory
-      FileSystem.StorageAccessFramework.createFileAsync(
-        permission.directoryUri,
-        `${fileName}.m4a`,
-        mimeType
-      )
-        .then(async (uri) => {
-          console.log(uri);
-          // Then copies the value
-          await FileSystem.writeAsStringAsync(uri, base64, {
-            encoding: "base64",
-          });
-          addRecording(fileName, uri);
-          hideRecorder();
-        })
-        .catch((e) => {
-          console.warn(e);
-        });
-    } else {
-      shareAsync(uri);
+      console.log("Audio file saved to internal storage successfully");
+
+      addRecording(fileName, internalFileUri);
+      hideRecorder();
+      showTransModal();
+    } catch (e) {
+      console.log("Error occured while saving file to internal storage", e);
     }
   };
 
@@ -159,16 +172,15 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
         [id, title, duration, createdAt, uri],
         (_, resultSet) => {
           console.log("Added new recording successfully");
-          setRecordings((prevRecs) => [
-            {
-              id,
-              title,
-              createdAt,
-              duration,
-              uri,
-            },
-            ...prevRecs,
-          ]);
+          const recordInfo = {
+            id,
+            title,
+            createdAt,
+            duration,
+            uri,
+          };
+          setRecordings((prevRecs) => [recordInfo, ...prevRecs]);
+          setRecordPreview(recordInfo);
         },
         (_, error) => {
           console.error("Error while inserting", error);
@@ -201,10 +213,21 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const renameAudio = (id: string, newTitle: string) => {
     db.transaction((tx) => {
-      tx.executeSql("UPDATE recordings SET title = ? WHERE id = ?", [
-        newTitle,
-        id,
-      ]);
+      tx.executeSql(
+        "UPDATE recordings SET title = ? WHERE id = ?",
+        [newTitle, id],
+        (_, resultSet) => {
+          console.log("Successfully deleted recording", id);
+          if (resultSet.rowsAffected > 0) {
+            let existingArr = [...recordings];
+            const index = existingArr.findIndex(
+              (recording) => recording.id === id
+            );
+            existingArr[index].title = newTitle;
+            setRecordings(existingArr);
+          }
+        }
+      );
     });
   };
 
@@ -219,8 +242,12 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
         setTimer,
         recordings,
         setRecordings,
-        isVisible,
-        setIsVisible,
+        isRecorderVisible,
+        setIsRecorderVisible,
+        recordPreview,
+        setRecordPreview,
+        isTransModalVisible,
+        hideTransModal,
         showRecorder,
         hideRecorder,
         clearStates,

@@ -47,8 +47,12 @@ export interface RecordingContextProps {
   setRecordings: React.Dispatch<
     React.SetStateAction<RecordDataItem[] | undefined[]>
   >;
-  isVisible: boolean;
-  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  recordPreview: RecordDataItem;
+  setRecordPreview: React.Dispatch<React.SetStateAction<RecordDataItem>>;
+  isRecorderVisible: boolean;
+  setIsRecorderVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  isTransModalVisible: boolean;
+  hideTransModal: () => void;
   showRecorder: () => void;
   hideRecorder: () => void;
   clearStates: () => void;

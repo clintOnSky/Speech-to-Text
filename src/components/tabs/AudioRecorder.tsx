@@ -11,7 +11,7 @@ const AudioRecorder = () => {
   const {
     timer,
     hideRecorder,
-    isVisible,
+    isRecorderVisible,
     startRecording,
     stopRecording,
     resumeRecording,
@@ -23,11 +23,11 @@ const AudioRecorder = () => {
 
   useEffect(() => {
     clearStates();
-  }, [isVisible]);
+  }, [isRecorderVisible]);
 
   return (
     <Modal
-      visible={isVisible}
+      visible={isRecorderVisible}
       onRequestClose={() => {
         hideRecorder();
       }}
