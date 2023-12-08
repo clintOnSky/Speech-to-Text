@@ -146,6 +146,10 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
       // Define the destination URI in internal storage
       const internalFileUri = `${internalDir}${fileName}.m4a`;
 
+      console.log(
+        "🚀 ~ file: recordingContext.tsx:149 ~ saveAudio ~ internalFileUri:",
+        internalFileUri
+      );
       await FileSystem.moveAsync({
         from: uri,
         to: internalFileUri,

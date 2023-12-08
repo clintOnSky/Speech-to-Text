@@ -8,8 +8,10 @@ import DatabaseProvider from "context/database";
 import PlaybackProvider from "@context/playbackContext";
 import RecordingProvider from "@context/recordingContext";
 import { TranscriptProvider } from "@context/transcriptContext";
+import useTranscribe from "hooks/useTranscribe";
 
 export default function TabLayout() {
+  const { data } = useTranscribe();
   return (
     <DatabaseProvider>
       <PlaybackProvider>
