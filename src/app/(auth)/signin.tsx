@@ -7,8 +7,9 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import CustomInput from "@comp/auth/CustomInput";
 import { useForm } from "react-hook-form";
 import { globalStyles } from "global/styles";
@@ -19,13 +20,25 @@ import {
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
 import { Link, Stack } from "expo-router";
+import { handleSignIn, AuthProps } from "@utils/authFunc";
 
 const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const SignIn = () => {
   const { control, handleSubmit } = useForm();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   console.log("Called");
+
+  const onSignInPress = async (signInInfo: {
+    email: string;
+    password: string;
+  }) => {
+    setIsLoading(true);
+    await handleSignIn(signInInfo);
+    setIsLoading(false);
+  };
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -69,7 +82,10 @@ const SignIn = () => {
               </TouchableOpacity>
             </Link>
             <View style={{ alignItems: "center" }}>
-              <CustomButton title="Sign In" onPress={handleSubmit(() => {})} />
+              <CustomButton
+                title="Sign In"
+                onPress={handleSubmit(onSignInPress)}
+              />
             </View>
             <View style={styles.signUpView}>
               <Text style={styles.noAccountText}>
@@ -83,6 +99,11 @@ const SignIn = () => {
             </View>
           </View>
         </ScrollView>
+        {isLoading && (
+          <View style={styles.loadingView}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        )}
       </KeyboardAvoidingView>
     </View>
   );
@@ -128,5 +149,16 @@ const styles = StyleSheet.create({
   signUp: {
     ...globalStyles.fontSemiBold16,
     color: COLORS.primary,
+  },
+  loadingView: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 2,
+    backgroundColor: COLORS.seeThrough,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

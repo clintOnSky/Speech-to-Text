@@ -3,16 +3,14 @@ import React from "react";
 import { COLORS } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { globalStyles } from "global/styles";
+import { handleSignOut } from "@utils/authFunc";
 
 const Settings = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Your Account</Text>
-      <View>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => console.log("Logging out")}
-        >
+      <View style={{ flex: 1 }}>
+        <TouchableOpacity style={styles.card} onPress={handleSignOut}>
           <Ionicons name="log-out-outline" size={24} color={COLORS.gray} />
           <Text style={styles.title}>Log out</Text>
           <Ionicons name="chevron-forward" size={24} color={COLORS.gray} />
@@ -28,14 +26,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.light,
-    padding: 16,
+    paddingTop: 16,
   },
   header: {
     ...globalStyles.fontSemiBold16,
     marginBottom: 16,
+    paddingHorizontal: 16,
   },
   card: {
     flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     gap: 24,
     alignItems: "center",
   },

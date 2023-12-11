@@ -4,15 +4,49 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Modal,
 } from "react-native";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { globalStyles } from "global/styles";
 import { COLORS, SIZES } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router";
+import { RecordingContext } from "@context/recordingContext";
+import * as DocumentPicker from "expo-document-picker";
+import { AuthUserContext } from "@context/authContext";
 
 const Home = () => {
+  const { showRecorder, saveAudio } = useContext(RecordingContext);
+  const { currentUser } = useContext(AuthUserContext);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const getAudioFromStorage = async () => {
+    try {
+      setIsLoading(true);
+      let result = await DocumentPicker.getDocumentAsync({
+        copyToCacheDirectory: true,
+        type: "audio/*",
+      });
+      if (!result.canceled) {
+        const file = result.assets[0];
+        if (file.size < 10000000) {
+          await saveAudio(file.uri);
+        } else {
+          Alert.alert(
+            "File size exceeded limits",
+            "Make sure the file is less than 25MB"
+          );
+        }
+      }
+      setIsLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content}>
@@ -20,28 +54,32 @@ const Home = () => {
           options={{
             header: () => (
               <View style={styles.header}>
-                <Text style={styles.welcome}>
-                  Welcome <Text style={styles.firstName}>Clinton</Text>
-                </Text>
-                <Text style={styles.remainingText}>
-                  Remaining Minutes:{" "}
-                  <Text style={{ color: COLORS.primary }}>89</Text>
+                <Text
+                  style={styles.welcome}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Welcome <Text style={styles.email}>{currentUser?.email}</Text>
                 </Text>
               </View>
             ),
           }}
         />
         <View style={styles.buttonView}>
-          <TouchableOpacity style={styles.button}>
-            <View style={styles.icon}>
-              <Ionicons name="mic-outline" size={30} color={COLORS.primary} />
-            </View>
-            <View style={{ gap: 5 }}>
-              <Text style={styles.buttonTitle}>Record</Text>
-              <Text style={styles.buttonDesc}>and Transcribe audio files</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
+          <Link href="/record" asChild>
+            <TouchableOpacity style={styles.button} onPress={showRecorder}>
+              <View style={styles.icon}>
+                <Ionicons name="mic-outline" size={30} color={COLORS.primary} />
+              </View>
+              <View style={{ gap: 5 }}>
+                <Text style={styles.buttonTitle}>Record</Text>
+                <Text style={styles.buttonDesc}>
+                  and Transcribe audio files
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </Link>
+          <TouchableOpacity style={styles.button} onPress={getAudioFromStorage}>
             <View style={styles.icon}>
               <Ionicons
                 name="musical-note-outline"
@@ -56,6 +94,12 @@ const Home = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <Modal visible={isLoading} transparent>
+        <View style={styles.loadingView}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -78,7 +122,7 @@ const styles = StyleSheet.create({
   welcome: {
     ...globalStyles.fontSemiBold20,
   },
-  firstName: {
+  email: {
     ...globalStyles.fontBold20,
     color: COLORS.primary,
   },
@@ -116,5 +160,16 @@ const styles = StyleSheet.create({
   buttonDesc: {
     ...globalStyles.fontSemiBold14,
     color: COLORS.primary,
+  },
+  loadingView: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 2,
+    backgroundColor: COLORS.seeThrough,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

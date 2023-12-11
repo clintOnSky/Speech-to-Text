@@ -1,9 +1,11 @@
-import { StyleSheet } from "react-native";
-import React from "react";
+import React, { memo, useContext } from "react";
 import * as SQLite from "expo-sqlite";
+import { AuthUserContext } from "./authContext";
 
 interface DatabaseContextProps {
   db: SQLite.SQLiteDatabase;
+  recordingTable: string;
+  transcriptTable: string;
 }
 
 export const DatabaseContext =
@@ -12,15 +14,19 @@ export const DatabaseContext =
 const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { currentUser } = useContext(AuthUserContext);
+  console.log("Database context called");
   const db = SQLite.openDatabase("audioTranscript.db");
 
+  const recordingTable = `recordings${currentUser?.uid}`;
+  const transcriptTable = `transcripts${currentUser?.uid}`;
+  console.log("🚀 ~ file: database.tsx:23 ~ recordingTable:", recordingTable);
+
   return (
-    <DatabaseContext.Provider value={{ db }}>
+    <DatabaseContext.Provider value={{ db, recordingTable, transcriptTable }}>
       {children}
     </DatabaseContext.Provider>
   );
 };
 
-export default DatabaseProvider;
-
-const styles = StyleSheet.create({});
+export default memo(DatabaseProvider);

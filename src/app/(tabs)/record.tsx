@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   Keyboard,
 } from "react-native";
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect, useRef, memo } from "react";
 import RecordItem from "@comp/tabs/RecordItem";
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
@@ -29,11 +29,11 @@ import {
 } from "types";
 import OptionsMenu from "@/components/tabs/OptionsMenu";
 import { shareAsync } from "expo-sharing";
-import * as FileSystem from "expo-file-system";
 import RecorderPreview from "@/components/tabs/RecorderPreview";
+import { AuthUserContext } from "@context/authContext";
 
 const Record = () => {
-  const { db } = useContext(DatabaseContext);
+  const { db, recordingTable } = useContext(DatabaseContext);
 
   const {
     recordings,
@@ -42,6 +42,8 @@ const Record = () => {
     deleteAudio,
     renameAudio,
     recordPreview,
+    setRecordPreview,
+    showTransModal,
   } = useContext(RecordingContext);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -74,15 +76,10 @@ const Record = () => {
   };
 
   const handleDelete = () => {
-    Alert.alert(
-      "Delete",
-      "This audio will be deleted",
-      [
-        { text: "Cancel", onPress: () => {} },
-        { text: "Delete", onPress: () => deleteAudio(selectedRecord.id) },
-      ],
-      { userInterfaceStyle: "dark" }
-    );
+    Alert.alert("Delete", "This audio will be deleted", [
+      { text: "Cancel", onPress: () => {} },
+      { text: "Delete", onPress: () => deleteAudio(selectedRecord.id) },
+    ]);
     hideMenu();
   };
 
@@ -112,8 +109,16 @@ const Record = () => {
     }
   };
 
+  const transcribeAudio = () => {
+    hideMenu();
+    console.log("Set", selectedRecord);
+    showTransModal();
+    setRecordPreview(selectedRecord);
+  };
+
   const menuData: MenuProps[] = [
     { title: "Rename", handleMenuPress: showRenameModal },
+    { title: "Transcribe", handleMenuPress: transcribeAudio },
     { title: "Share", handleMenuPress: shareAudio },
     { title: "Delete", handleMenuPress: handleDelete },
   ];
@@ -121,7 +126,7 @@ const Record = () => {
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS recordings (id TEXT PRIMARY KEY, title TEXT, createdAt DATETIME, duration INTEGER, uri TEXT)",
+        `CREATE TABLE IF NOT EXISTS ${recordingTable} (id TEXT PRIMARY KEY, title TEXT, createdAt DATETIME, duration INTEGER, uri TEXT)`,
         null,
         (_, resultSet) => {},
         (_, error) => {
@@ -132,7 +137,7 @@ const Record = () => {
     });
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM recordings",
+        `SELECT * FROM ${recordingTable} ORDER BY createdAt DESC`,
         null,
         (_, resultSet) => {
           setRecordings(resultSet.rows._array);
@@ -267,7 +272,7 @@ const Record = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      {recordPreview && <RecorderPreview />}
+      {recordPreview && <RecorderPreview recordPreview={recordPreview} />}
     </View>
   );
 };

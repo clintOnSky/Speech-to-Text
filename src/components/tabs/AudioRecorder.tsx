@@ -33,44 +33,46 @@ const AudioRecorder = () => {
       }}
       animationType="slide"
     >
-      <View style={styles.container}>
-        <Text style={styles.title}>Record</Text>
-        <View style={styles.timerView}>
-          <Text style={styles.timer}>{getDuration(timer)}</Text>
-        </View>
-        <View style={styles.buttonView}>
-          <>
-            <TouchableOpacity
-              onPress={
-                isRecording && !recording
-                  ? startRecording
-                  : isRecording && recording
-                  ? pauseRecording
-                  : resumeRecording
-              }
-            >
-              <MaterialCommunityIcons
-                name={
-                  !recording || isRecording === false
-                    ? "record-circle-outline"
-                    : "pause-circle-outline"
+      {isRecorderVisible && (
+        <View style={styles.container}>
+          <Text style={styles.title}>Record</Text>
+          <View style={styles.timerView}>
+            <Text style={styles.timer}>{getDuration(timer)}</Text>
+          </View>
+          <View style={styles.buttonView}>
+            <>
+              <TouchableOpacity
+                onPress={
+                  isRecording && !recording
+                    ? startRecording
+                    : isRecording && recording
+                    ? pauseRecording
+                    : resumeRecording
                 }
-                size={wp(25)}
-                color={COLORS.primary}
-              />
-            </TouchableOpacity>
-            {recording && (
-              <TouchableOpacity onPress={stopRecording}>
+              >
                 <MaterialCommunityIcons
-                  name="stop-circle-outline"
+                  name={
+                    !recording || isRecording === false
+                      ? "record-circle-outline"
+                      : "pause-circle-outline"
+                  }
                   size={wp(25)}
-                  color={COLORS.red}
+                  color={COLORS.primary}
                 />
               </TouchableOpacity>
-            )}
-          </>
+              {recording && (
+                <TouchableOpacity onPress={stopRecording}>
+                  <MaterialCommunityIcons
+                    name="stop-circle-outline"
+                    size={wp(25)}
+                    color={COLORS.red}
+                  />
+                </TouchableOpacity>
+              )}
+            </>
+          </View>
         </View>
-      </View>
+      )}
     </Modal>
   );
 };

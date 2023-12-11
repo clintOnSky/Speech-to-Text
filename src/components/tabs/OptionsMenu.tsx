@@ -25,6 +25,8 @@ const OptionsMenu = ({ data }: OptionsMenuProps) => {
             name={
               item.title === "Rename"
                 ? "pencil-sharp"
+                : item.title === "Transcribe"
+                ? "document-text-outline"
                 : item.title === "Share"
                 ? "share-outline"
                 : "trash-outline"

@@ -1,5 +1,5 @@
 import type { AVPlaybackStatusSuccess, Audio } from "expo-av";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, memo } from "react";
 import { PlaybackStatus } from "types";
 
 interface PlaybackContextProps {
@@ -16,6 +16,7 @@ export const PlaybackContext = createContext<PlaybackContextProps>(null);
 const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  console.log("Playback context called");
   const [sound, setSound] = useState<Audio.Sound>(null);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>(null);
   const [currentURI, setCurrentURI] = useState<string>("");
@@ -57,4 +58,4 @@ const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export default PlaybackProvider;
+export default memo(PlaybackProvider);

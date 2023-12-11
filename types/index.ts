@@ -1,5 +1,6 @@
 import type { AVPlaybackStatus, AVPlaybackStatusSuccess } from "expo-av";
 import type { Recording } from "expo-av/build/Audio";
+import { User } from "firebase/auth";
 
 export interface MenuProps {
   title: string;
@@ -18,11 +19,22 @@ export interface RecordCardProps {
   uri: string;
 }
 
+export interface TranscriptCardProps {
+  title: string;
+  content: string;
+  summary: string;
+  createdAt: string;
+  audioId: string;
+  id: string;
+}
+
 export interface AudioFileData {
   uri: string;
   title: string;
   timer: number;
 }
+
+export type TranscriptDataItem = TranscriptCardProps;
 
 export type RecordDataItem = RecordCardProps;
 
@@ -36,6 +48,15 @@ export type RecordDataItem = RecordCardProps;
 
 export type PlaybackStatus = AVPlaybackStatus | AVPlaybackStatusSuccess;
 
+export interface TranscriptContenxtProps {
+  transcripts: TranscriptDataItem[];
+  setTranscripts: React.Dispatch<React.SetStateAction<TranscriptDataItem[]>>;
+  deleteTranscript: (id: string) => void;
+  renameTranscript: (id: string, newTitle: string) => void;
+  handleTranscribe: () => Promise<void>;
+  updateDocContent: (id: string, newContent: string) => void;
+}
+
 export interface RecordingContextProps {
   recording: Recording | undefined;
   setRecording: React.Dispatch<React.SetStateAction<Recording | undefined>>;
@@ -43,7 +64,7 @@ export interface RecordingContextProps {
   setIsRecording: React.Dispatch<React.SetStateAction<boolean>>;
   timer: number;
   setTimer: React.Dispatch<React.SetStateAction<number>>;
-  recordings: RecordDataItem[] | undefined[];
+  recordings: RecordDataItem[];
   setRecordings: React.Dispatch<
     React.SetStateAction<RecordDataItem[] | undefined[]>
   >;
@@ -52,6 +73,7 @@ export interface RecordingContextProps {
   isRecorderVisible: boolean;
   setIsRecorderVisible: React.Dispatch<React.SetStateAction<boolean>>;
   isTransModalVisible: boolean;
+  showTransModal: () => void;
   hideTransModal: () => void;
   showRecorder: () => void;
   hideRecorder: () => void;
@@ -62,4 +84,10 @@ export interface RecordingContextProps {
   stopRecording: () => Promise<void>;
   deleteAudio: (id: string) => void;
   renameAudio: (id: string, newTitle: string) => void;
+  saveAudio: (uri: string) => Promise<void>;
+}
+
+export interface AuthUserProps {
+  currentUser: User;
+  onSignOut: () => void;
 }

@@ -1,22 +1,50 @@
-import { StyleSheet, Text, View, TouchableOpacity, Modal } from "react-native";
-import React, { useContext } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
+import React, { useContext, useState } from "react";
 import { COLORS, SIZES } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
 import { getDateTime, getDuration } from "@utils/recordingFunc";
 import { RecordingContext } from "@context/recordingContext";
+import { RecordDataItem } from "types";
+import { transcribeAudio } from "@utils/transcribeFunc";
+import { TranscriptContext } from "@context/transcriptContext";
+import { router } from "expo-router";
 
-const RecorderPreview = () => {
-  const {
-    recordPreview,
-    setRecordPreview,
-    isTransModalVisible,
-    hideTransModal,
-  } = useContext(RecordingContext);
+interface RecordPreviewProps {
+  recordPreview: RecordDataItem;
+}
 
-  const { date, time } = getDateTime(recordPreview.createdAt);
+const RecorderPreview = ({ recordPreview }: RecordPreviewProps) => {
+  // State variables
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Context variables
+  const { setRecordPreview, isTransModalVisible, hideTransModal } =
+    useContext(RecordingContext);
+  const { handleTranscribe } = useContext(TranscriptContext);
+
   const duration = getDuration(recordPreview.duration);
+
+  const handleCancel = () => {
+    setRecordPreview(null);
+    hideTransModal();
+  };
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    await handleTranscribe();
+    setIsLoading(false);
+    setRecordPreview(null);
+    hideTransModal();
+  };
   return (
     <Modal
       transparent
@@ -25,36 +53,40 @@ const RecorderPreview = () => {
       animationType="fade"
     >
       <View style={styles.background}>
-        <View style={styles.container}>
-          <Text style={styles.header}>Transcribe</Text>
-          <View style={styles.audioCard}>
-            <View style={styles.recordIcon}>
-              <Ionicons
-                name="recording-sharp"
-                size={24}
-                color={COLORS.primary}
-              />
-            </View>
-            <Text style={styles.title} numberOfLines={1}>
-              {recordPreview.title}
-            </Text>
+        {isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        ) : (
+          <View style={styles.container}>
+            <Text style={styles.header}>Transcribe</Text>
+            <View style={styles.audioCard}>
+              <View style={styles.recordIcon}>
+                <Ionicons
+                  name="recording-sharp"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              </View>
+              <Text style={styles.title} numberOfLines={1}>
+                {recordPreview.title}
+              </Text>
 
-            <Text style={[styles.duration, { marginRight: 10 }]}>
-              {duration}
+              <Text style={[styles.duration, { marginRight: 10 }]}>
+                {duration}
+              </Text>
+            </View>
+            <Text style={styles.confirmationText}>
+              Do you want to transcribe audio?
             </Text>
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.okButton} onPress={handleConfirm}>
+                <Text style={styles.okText}>OK</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <Text style={styles.confirmationText}>
-            Do you want to transcribe audio?
-          </Text>
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={hideTransModal}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.okButton} onPress={hideTransModal}>
-              <Text style={styles.okText}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        )}
       </View>
     </Modal>
   );

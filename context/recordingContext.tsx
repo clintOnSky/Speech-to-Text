@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext, memo } from "react";
 import { DatabaseContext } from "./database";
 import { PlaybackContext } from "./playbackContext";
 import { PermissionResponse, Recording } from "expo-av/build/Audio";
@@ -8,13 +8,15 @@ import { getCurrentISOString } from "@utils/index";
 import * as FileSystem from "expo-file-system";
 import { RecordDataItem, RecordingContextProps } from "types";
 import uuid from "react-native-uuid";
+import { getAudioDuration } from "@utils/playbackFunc";
 
 export const RecordingContext = createContext<RecordingContextProps>(null);
 
 const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { db } = useContext(DatabaseContext);
+  console.log("Record context called");
+  const { db, recordingTable } = useContext(DatabaseContext);
 
   // Stores actual recorded audio
   const [recording, setRecording] = useState<Recording | undefined>();
@@ -67,7 +69,6 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     }
   }
-  // console.log("Called recordingContext");
 
   async function startRecording() {
     try {
@@ -124,14 +125,13 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setSound(sound);
 
-    const fileName = "AUD" + getCurrentISOString().replace(/[-T:Z.]/g, "");
-
     const uri = recording.getURI();
 
-    saveAudio(uri, fileName);
+    await saveAudio(uri);
   }
 
-  const saveAudio = async (uri: string, fileName: string) => {
+  const saveAudio = async (uri: string) => {
+    const fileName = "AUD" + getCurrentISOString().replace(/[-T:Z.]/g, "");
     try {
       const internalDir = FileSystem.documentDirectory + "audio/";
 
@@ -146,11 +146,7 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
       // Define the destination URI in internal storage
       const internalFileUri = `${internalDir}${fileName}.m4a`;
 
-      console.log(
-        "🚀 ~ file: recordingContext.tsx:149 ~ saveAudio ~ internalFileUri:",
-        internalFileUri
-      );
-      await FileSystem.moveAsync({
+      await FileSystem.copyAsync({
         from: uri,
         to: internalFileUri,
       });
@@ -165,14 +161,14 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const addRecording = (title: string, uri: string) => {
+  const addRecording = async (title: string, uri: string) => {
     const createdAt = getCurrentISOString();
-    const duration = timer;
+    const duration = await getAudioDuration(uri);
     const id = uuid.v4().toString();
 
     db.transaction((tx) => {
       tx.executeSql(
-        "INSERT INTO recordings (id, title, duration, createdAt, uri) VALUES (?, ?, ?, ?, ?)",
+        `INSERT INTO ${recordingTable} (id, title, duration, createdAt, uri) VALUES (?, ?, ?, ?, ?)`,
         [id, title, duration, createdAt, uri],
         (_, resultSet) => {
           console.log("Added new recording successfully");
@@ -197,7 +193,7 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
   const deleteAudio = (id: string) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "DELETE FROM recordings WHERE id = ?",
+        `DELETE FROM ${recordingTable} WHERE id = ?`,
         [id],
         (_, resultSet) => {
           console.log("Successfully deleted recording", id);
@@ -218,7 +214,7 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
   const renameAudio = (id: string, newTitle: string) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "UPDATE recordings SET title = ? WHERE id = ?",
+        `UPDATE ${recordingTable} SET title = ? WHERE id = ?`,
         [newTitle, id],
         (_, resultSet) => {
           console.log("Successfully deleted recording", id);
@@ -251,6 +247,7 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
         recordPreview,
         setRecordPreview,
         isTransModalVisible,
+        showTransModal,
         hideTransModal,
         showRecorder,
         hideRecorder,
@@ -261,6 +258,7 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
         stopRecording,
         deleteAudio,
         renameAudio,
+        saveAudio,
       }}
     >
       {children}
@@ -268,6 +266,8 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export default RecordingProvider;
+const MemoizedRecorderProvider = memo(RecordingProvider);
+
+export default MemoizedRecorderProvider;
 
 const styles = StyleSheet.create({});

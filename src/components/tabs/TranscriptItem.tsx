@@ -14,25 +14,37 @@ import {
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
-import { MenuProps, PositionProps, RecordCardProps } from "types";
+import {
+  MenuProps,
+  PositionProps,
+  RecordCardProps,
+  TranscriptDataItem,
+} from "types";
 import OptionsMenu from "./OptionsMenu";
 import { router } from "expo-router";
+import { getDateTime } from "@utils/recordingFunc";
 
-type RecordItemProps = {
-  recordData: RecordCardProps;
-};
+interface TranscriptItemProps {
+  transcript: TranscriptDataItem;
+  setMenuPosition: (data: PositionProps | null) => void;
+  setIsVisible: (value: boolean) => void;
+  setSelectedDoc: (data: TranscriptDataItem) => void;
+}
 
-const TranscriptItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<PositionProps | null>(null);
-
+const TranscriptItem: FC<TranscriptItemProps> = ({
+  transcript,
+  setMenuPosition,
+  setIsVisible,
+  setSelectedDoc,
+}) => {
   // const { onDelete } = useContext(RecordContext);
+  const { date, time } = getDateTime(transcript.createdAt);
 
   const touchableRef = useRef<TouchableOpacity>(null);
 
   const handleDelete = () => {
     hideMenu();
-    // onDelete(recordData);
+    // onDelete(transcript);
   };
 
   function hideMenu() {
@@ -46,6 +58,7 @@ const TranscriptItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
   ];
 
   const showMenu = useCallback(() => {
+    setSelectedDoc(transcript);
     touchableRef?.current?.measureInWindow((x, y, width, height) => {
       if (y + height > hp(70)) {
         setMenuPosition({ top: hp(70), left: x - 85 });
@@ -61,7 +74,7 @@ const TranscriptItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
       {/* Transcription Card */}
       <TouchableOpacity
         style={styles.container}
-        onPress={() => router.push(`/${recordData.title}`)}
+        onPress={() => router.push(`/${transcript.id}`)}
       >
         <View style={styles.transcriptIcon}>
           <Ionicons
@@ -72,10 +85,10 @@ const TranscriptItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
         </View>
         <View style={{ flex: 1, gap: 5, justifyContent: "center" }}>
           <Text style={styles.title} numberOfLines={1}>
-            {recordData.title}
+            {transcript.title}
           </Text>
           <Text style={styles.date} numberOfLines={1}>
-            25-11-2023 <Text>15:11</Text>
+            {date} <Text>{time}</Text>
           </Text>
         </View>
         <TouchableOpacity
@@ -86,16 +99,6 @@ const TranscriptItem: FC<RecordItemProps> = ({ recordData: recordData }) => {
           <Ionicons name="ellipsis-vertical" size={24} color={COLORS.gray} />
         </TouchableOpacity>
       </TouchableOpacity>
-      {/* Options Menu */}
-      <Modal transparent={true} visible={isVisible} onRequestClose={hideMenu}>
-        <TouchableWithoutFeedback onPressIn={hideMenu}>
-          <View style={styles.modal}>
-            <View style={[styles.optionMenu, menuPosition && menuPosition]}>
-              <OptionsMenu data={menuData} />
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
     </>
   );
 };

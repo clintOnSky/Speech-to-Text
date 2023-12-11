@@ -19,6 +19,7 @@ import {
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
 import { router } from "expo-router";
+import { handleSignUp } from "@utils/authFunc";
 
 const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -75,7 +76,7 @@ const SignUp = () => {
             <View style={{ alignItems: "center" }}>
               <CustomButton
                 title="Sign Up"
-                onPress={handleSubmit(() => console.log("Pressed"))}
+                onPress={handleSubmit(handleSignUp)}
               />
             </View>
             <View style={styles.signUpView}>
