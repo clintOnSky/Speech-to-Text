@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Speech-to-Text",
-    "slug": "Speech-to-Text",
+    "name": "TransLect",
+    "slug": "TransLect",
     "version": "1.0.0",
     "scheme": "speech",
     "orientation": "portrait",
@@ -22,7 +22,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.clinton_sky.TransLect"
     },
     "experiments": {
       "tsconfigPaths": true,
@@ -39,7 +40,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "b4381ded-8c25-4316-a523-010dc9a3a5ac"
+        "projectId": "a3cd03be-1cfa-40ca-9292-8db2ca9ff461"
       }
     }
   }

@@ -1,5 +1,5 @@
 {
-  "name": "speech-to-text",
+  "name": "trans-lect",
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
