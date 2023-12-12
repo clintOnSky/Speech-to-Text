@@ -1,5 +1,5 @@
 import { Text, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
-import React, { useCallback, useEffect, useState, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { COLORS, SIZES } from "@const/index";
 import { globalStyles } from "global/styles";

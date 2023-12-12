@@ -29,6 +29,8 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import OptionsMenu from "@/components/tabs/OptionsMenu";
 import { ActivityIndicator } from "react-native";
 import { AuthUserContext } from "@context/authContext";
+import { set } from "react-hook-form";
+import axios from "axios";
 
 const Transcript = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -99,33 +101,59 @@ const Transcript = () => {
     setTitle(selectedTranscript.title);
     setIsModalVisible(true);
   };
-
   // To be added
   // const shareAudio = async () => {
   //   shareFile(selectedTranscript.);
   // };
+  // const dummyTranscripts = [
+  //   {
+  //     id: "1",
+  //     title: "Transcript 1",
+  //     createdAt: "2023-01-01T12:00:00Z",
+  //     content: "This is the content of transcript 1.",
+  //     summary: "Summary of transcript 1.",
+  //     audioId: "audio_1",
+  //   },
+  //   {
+  //     id: "2",
+  //     title: "Transcript 2",
+  //     createdAt: "2023-01-02T14:30:00Z",
+  //     content: "This is the content of transcript 2.",
+  //     summary: "Summary of transcript 2.",
+  //     audioId: "audio_2",
+  //   },
+  //   {
+  //     id: "3",
+  //     title: "Transcript 3",
+  //     createdAt: "2023-01-03T09:45:00Z",
+  //     content: "This is the content of transcript 3.",
+  //     summary: "Summary of transcript 3.",
+  //     audioId: "audio_3",
+  //   },
+  //   // Add more dummy data as needed
+  // ];
 
   const menuData: MenuProps[] = [
     { title: "Rename", handleMenuPress: showRenameModal },
     { title: "Delete", handleMenuPress: handleDelete },
   ];
 
-  // useEffect(() => {
-  //   db.transaction((tx) => {
-  //     tx.executeSql(
-  //       "DROP TABLE IF EXISTS transcripts",
-  //       [],
-  //       (_, result) => {
-  //         console.log("Table deleted successfully");
-  //       },
-  //       (_, error) => {
-  //         console.error("Error deleting table:", error);
-  //         return true;
-  //       }
-  //     );
-  //   });
-  //   setIsLoading(false);
-  // }, []);
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DROP TABLE IF EXISTS transcripts",
+        [],
+        (_, result) => {
+          console.log("Table deleted successfully");
+        },
+        (_, error) => {
+          console.error("Error deleting table:", error);
+          return true;
+        }
+      );
+    });
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     // Focus the input and set the selection to the end when the component mounts
@@ -137,27 +165,33 @@ const Transcript = () => {
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS ${transcriptTable} (id TEXT PRIMARY KEY, title TEXT, createdAt DATETIME, content TEXT, summary TEXT, audioId TEXT)`,
         null,
-        (_, resultSet) => {},
+        (_, resultSet) => {
+          tx.executeSql(
+            `SELECT * FROM ${transcriptTable} ORDER BY createdAt DESC`,
+            null,
+            (_, resultSet) => {
+              setTranscripts(resultSet.rows._array);
+              console.log(
+                "🚀 ~ file: transcript.tsx:175 ~ db.transaction ~ resultSet.rows._array:",
+                resultSet.rows._array
+              );
+              setIsLoading(false);
+            },
+            // @ts-ignore
+            (_, error) => {
+              console.warn(error);
+              setIsLoading(false);
+            }
+          );
+          setIsLoading(false);
+        },
+        // @ts-ignore
         (_, error) => {
           console.log(error);
-          return true;
+          setIsLoading(false);
         }
       );
     });
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM ${transcriptTable} ORDER BY createdAt DESC`,
-        null,
-        (_, resultSet) => {
-          setTranscripts(resultSet.rows._array);
-        },
-        (_, error) => {
-          console.warn(error);
-          return null;
-        }
-      );
-    });
-    setIsLoading(false);
   }, [selectedTranscript]);
 
   return (
@@ -209,6 +243,7 @@ const Transcript = () => {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={hideRenameModal}
+        statusBarTranslucent
       >
         <TouchableWithoutFeedback onPressIn={() => Keyboard.dismiss()}>
           <View style={[styles.modal, { backgroundColor: "rgba(0,0,0,0.2)" }]}>

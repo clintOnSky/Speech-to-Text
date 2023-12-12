@@ -54,7 +54,11 @@ export interface TranscriptContenxtProps {
   deleteTranscript: (id: string) => void;
   renameTranscript: (id: string, newTitle: string) => void;
   handleTranscribe: () => Promise<void>;
-  updateDocContent: (id: string, newContent: string) => void;
+  updateTranscript: (
+    id: string,
+    newContent: string,
+    newSummary: string
+  ) => void;
 }
 
 export interface RecordingContextProps {

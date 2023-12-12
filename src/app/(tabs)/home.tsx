@@ -38,13 +38,14 @@ const Home = () => {
         } else {
           Alert.alert(
             "File size exceeded limits",
-            "Make sure the file is less than 25MB"
+            "Make sure the file is less than 10MB"
           );
         }
       }
       setIsLoading(false);
     } catch (e) {
       console.log(e);
+      setIsLoading(false);
     }
   };
   return (
@@ -95,7 +96,7 @@ const Home = () => {
         </View>
       </ScrollView>
 
-      <Modal visible={isLoading} transparent>
+      <Modal visible={isLoading} transparent statusBarTranslucent>
         <View style={styles.loadingView}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>

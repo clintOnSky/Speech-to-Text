@@ -131,6 +131,7 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   const saveAudio = async (uri: string) => {
+    console.log("🚀 ~ file: recordingContext.tsx:134 ~ saveAudio ~ uri:", uri);
     const fileName = "AUD" + getCurrentISOString().replace(/[-T:Z.]/g, "");
     try {
       const internalDir = FileSystem.documentDirectory + "audio/";
@@ -266,8 +267,4 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-const MemoizedRecorderProvider = memo(RecordingProvider);
-
-export default MemoizedRecorderProvider;
-
-const styles = StyleSheet.create({});
+export default RecordingProvider;

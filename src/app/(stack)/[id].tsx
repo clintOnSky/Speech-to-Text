@@ -7,8 +7,17 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Modal,
 } from "react-native";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, SIZES } from "@const/index";
@@ -19,20 +28,31 @@ import {
 import { DatabaseContext } from "@context/database";
 import { TranscriptContext } from "@context/transcriptContext";
 import { globalStyles } from "global/styles";
+import CustomButton from "@/components/auth/CustomButton";
+import SummaryOptions from "@/components/stack/SummaryOptions";
+import { ActivityIndicator } from "react-native";
 
 const Document = () => {
   const { id } = useLocalSearchParams();
 
   const { db, transcriptTable } = useContext(DatabaseContext);
-  const { updateDocContent, transcripts } = useContext(TranscriptContext);
+  const { updateTranscript, transcripts } = useContext(TranscriptContext);
 
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [content, setContent] = useState<string>("");
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState<string>("");
+  const [summary, setSummary] = useState<string>("");
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  console.log("🚀 ~ file: [id].tsx:47 ~ Document ~ isLoading:", isLoading);
+
+  const [selectedType, setSelectedType] = useState("Full Text");
 
   const textInputRef = useRef<TextInput>(null);
 
   const navigation = useNavigation();
+
+  const contentType = ["Full Text", "Summary"];
 
   useEffect(() => {
     db?.transaction((tx) => {
@@ -40,9 +60,10 @@ const Document = () => {
         `SELECT * FROM ${transcriptTable} WHERE id = ?`,
         [id.toString()],
         (_, resultSet) => {
-          console.log(resultSet.rows._array[0]);
-          setTitle(resultSet.rows._array[0].title);
-          setContent(resultSet.rows._array[0].content);
+          const transcript = resultSet.rows._array[0];
+          setTitle(transcript.title);
+          setContent(transcript.content);
+          setSummary(transcript.summary);
         },
         (_, resultSet) => {
           console.log("Error occured when getting transcript", resultSet);
@@ -53,7 +74,6 @@ const Document = () => {
   }, [id.toString(), transcripts]);
 
   useEffect(() => {
-    console.log("Rendering headers");
     navigation.setOptions({
       title: title,
       headerTitle: () => (
@@ -88,8 +108,8 @@ const Document = () => {
         ) : (
           <TouchableOpacity
             onPress={() => {
+              updateTranscript(id.toString(), content, summary);
               setIsEditable(false);
-              updateDocContent(id.toString(), content);
             }}
             style={styles.saveView}
           >
@@ -99,58 +119,176 @@ const Document = () => {
     });
     // Focus the input and set the selection to the end when the component mounts
     focusOnTextInput();
-  }, [content, isEditable]);
+  }, [content, summary, isEditable]);
+
+  const showModal = () => {
+    setIsVisible(true);
+  };
+
+  const hideModal = () => {
+    setIsVisible(false);
+  };
+
+  const handleSummary = useCallback((summary: string) => {
+    setSummary(summary);
+  }, []);
+
+  const handleSelectedContent = useCallback((type: string) => {
+    setSelectedType(type);
+  }, []);
+
+  const handleEdit = useCallback((editable: boolean) => {
+    setIsEditable(editable);
+  }, []);
+
+  const handleIsLoading = (loading: boolean) => {
+    setIsLoading(loading);
+  };
 
   const focusOnTextInput = () => {
     textInputRef.current?.focus();
   };
   return (
     <TouchableWithoutFeedback
-      style={{ flex: 1, backgroundColor: "blue" }}
+      style={{ flex: 1 }}
       onPress={() => {
         focusOnTextInput();
         console.log("called");
       }}
+      disabled={!isEditable}
     >
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: isEditable ? COLORS.lightBrown : COLORS.light },
-        ]}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView
-          style={{
-            flex: 1,
-          }}
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: isEditable ? COLORS.lightBrown : COLORS.light },
+          ]}
         >
-          {isEditable ? (
-            <TextInput
-              value={content}
+          <View
+            style={{
+              flexDirection: "row",
+              position: "absolute",
+              top: 10,
+              left: 0,
+              right: 0,
+              zIndex: 1,
+              paddingVertical: 5,
+              gap: 15,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {!isEditable &&
+              contentType.map((type, index) => (
+                <TouchableOpacity
+                  key={index.toString()}
+                  style={[
+                    styles.contentTypeBtn,
+                    {
+                      backgroundColor:
+                        selectedType === type ? COLORS.primary : COLORS.white,
+                    },
+                  ]}
+                  onPress={() => setSelectedType(type)}
+                >
+                  <Text
+                    style={[
+                      styles.contentTypeText,
+                      {
+                        color:
+                          selectedType === type ? COLORS.white : COLORS.primary,
+                      },
+                    ]}
+                  >
+                    {type}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+          </View>
+          <ScrollView
+            style={{
+              flex: 1,
+            }}
+            contentContainerStyle={[
+              styles.content,
+              { paddingTop: isEditable ? 10 : 50 },
+            ]}
+            keyboardShouldPersistTaps="handled"
+          >
+            {isEditable ? (
+              <TextInput
+                value={selectedType === "Full Text" ? content : summary}
+                style={{
+                  ...globalStyles.fontMedium16,
+                  paddingHorizontal: 20,
+                  lineHeight: 25,
+                  marginBottom: hp(30),
+                }}
+                onChangeText={(text) => {
+                  if (selectedType === "Full Text") {
+                    setContent(text);
+                  } else {
+                    setSummary(text);
+                  }
+                }}
+                multiline
+                ref={textInputRef}
+              />
+            ) : (
+              <Text
+                style={{
+                  paddingHorizontal: 20,
+                  paddingBottom: hp(30),
+                  lineHeight: 25,
+                  ...globalStyles.fontSemiBold16,
+                }}
+              >
+                {selectedType === "Full Text" ? content : summary}
+              </Text>
+            )}
+          </ScrollView>
+          {!(selectedType === "Summary") && !isEditable && (
+            <View
               style={{
-                width: "100%",
-                ...globalStyles.fontMedium16,
-                paddingHorizontal: 20,
-                lineHeight: 20,
-              }}
-              onChangeText={setContent}
-              multiline
-              ref={textInputRef}
-            />
-          ) : (
-            <Text
-              style={{
-                lineHeight: wp(SIZES.medium2),
-                paddingHorizontal: 20,
-                ...globalStyles.fontSemiBold16,
+                paddingHorizontal: wp(SIZES.medium),
+                alignItems: "center",
+                justifyContent: "center",
+                position: "absolute",
+                bottom: 20,
+                left: 0,
+                right: 0,
               }}
             >
-              {content}
-            </Text>
+              <CustomButton title="Summarize" onPress={showModal} />
+            </View>
           )}
-        </ScrollView>
-      </View>
+          <SummaryOptions
+            content={content}
+            isVisible={isVisible}
+            setIsLoading={handleIsLoading}
+            hideModal={hideModal}
+            setIsEditable={handleEdit}
+            setSelectedContent={handleSelectedContent}
+            setSummary={handleSummary}
+          />
+        </View>
+        <Modal visible={isLoading} transparent statusBarTranslucent>
+          <View
+            style={{
+              flex: 1,
+              zIndex: 4,
+              backgroundColor: COLORS.seeThrough,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        </Modal>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
@@ -165,6 +303,20 @@ const styles = StyleSheet.create({
   },
   content: {
     minHeight: hp(80),
+  },
+  contentTypeBtn: {
+    paddingVertical: 8,
+    width: wp(20),
+    alignItems: "center",
+    borderRadius: 16,
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    elevation: 1,
+  },
+  contentTypeText: {
+    ...globalStyles.fontBold14,
+    color: COLORS.primary,
   },
   saveView: {
     paddingHorizontal: 8,

@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
+  Button,
 } from "react-native";
 import React, { useContext, useState, useEffect, useRef, memo } from "react";
 import RecordItem from "@comp/tabs/RecordItem";
@@ -31,10 +32,10 @@ import OptionsMenu from "@/components/tabs/OptionsMenu";
 import { shareAsync } from "expo-sharing";
 import RecorderPreview from "@/components/tabs/RecorderPreview";
 import { AuthUserContext } from "@context/authContext";
+import { openDatabase } from "expo-sqlite";
 
 const Record = () => {
   const { db, recordingTable } = useContext(DatabaseContext);
-
   const {
     recordings,
     setRecordings,
@@ -123,34 +124,41 @@ const Record = () => {
     { title: "Delete", handleMenuPress: handleDelete },
   ];
 
-  useEffect(() => {
+  const getRecordData = () => {
     db.transaction((tx) => {
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS ${recordingTable} (id TEXT PRIMARY KEY, title TEXT, createdAt DATETIME, duration INTEGER, uri TEXT)`,
         null,
-        (_, resultSet) => {},
+        (_, resultSet) => {
+          console.log("Table created successfully");
+          // Fetch data after creating the table
+          tx.executeSql(
+            `SELECT * FROM ${recordingTable} ORDER BY createdAt DESC`,
+            null,
+            (_, resultSet) => {
+              setRecordings(resultSet.rows._array);
+              setIsLoading(false);
+              console.log("Data fetched successfully");
+            },
+            // @ts-ignore
+            (_, error) => {
+              console.warn(error);
+              setIsLoading(false);
+            }
+          );
+        },
+        // @ts-ignore
         (_, error) => {
           console.log(error);
-          return true;
+          setIsLoading(false);
         }
       );
     });
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM ${recordingTable} ORDER BY createdAt DESC`,
-        null,
-        (_, resultSet) => {
-          setRecordings(resultSet.rows._array);
-        },
-        (_, error) => {
-          console.warn(error);
-          return null;
-        }
-      );
-    });
+  };
 
-    setIsLoading(false);
-  }, [selectedRecord]);
+  useEffect(() => {
+    getRecordData();
+  }, []); // Run once when the component mounts
 
   // useEffect(() => {
   //   db.transaction((tx) => {
@@ -240,6 +248,7 @@ const Record = () => {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={hideRenameModal}
+        statusBarTranslucent
       >
         <TouchableWithoutFeedback onPressIn={() => Keyboard.dismiss()}>
           <View style={[styles.modal, { backgroundColor: "rgba(0,0,0,0.2)" }]}>
@@ -272,6 +281,7 @@ const Record = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+      {/* <Button title="get data" onPress={getRecordData} /> */}
       {recordPreview && <RecorderPreview recordPreview={recordPreview} />}
     </View>
   );

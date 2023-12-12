@@ -1,4 +1,4 @@
-import React, { memo, useContext } from "react";
+import React, { useContext } from "react";
 import * as SQLite from "expo-sqlite";
 import { AuthUserContext } from "./authContext";
 
@@ -20,7 +20,6 @@ const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const recordingTable = `recordings${currentUser?.uid}`;
   const transcriptTable = `transcripts${currentUser?.uid}`;
-  console.log("🚀 ~ file: database.tsx:23 ~ recordingTable:", recordingTable);
 
   return (
     <DatabaseContext.Provider value={{ db, recordingTable, transcriptTable }}>
@@ -29,4 +28,4 @@ const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export default memo(DatabaseProvider);
+export default DatabaseProvider;

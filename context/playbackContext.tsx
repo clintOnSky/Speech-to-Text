@@ -58,4 +58,4 @@ const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export default memo(PlaybackProvider);
+export default PlaybackProvider;

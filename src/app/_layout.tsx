@@ -6,7 +6,7 @@ import { COLORS } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import DatabaseProvider from "@context/database";
 import RecordingProvider from "@context/recordingContext";
-import { TranscriptProvider } from "@context/transcriptContext";
+import TranscriptProvider from "@context/transcriptContext";
 import PlaybackProvider from "@context/playbackContext";
 import { AuthUserProvider } from "@context/authContext";
 

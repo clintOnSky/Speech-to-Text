@@ -40,6 +40,7 @@ export async function transcribeAudio(
     }
 
     router.push("/transcript");
+    console.log(responseData.text);
     return responseData.text;
   } catch (error) {
     // console.error("Axios request error:", error.code);

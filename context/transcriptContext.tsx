@@ -118,19 +118,34 @@ const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  const updateDocContent = (id: string, newContent: string) => {
+  const updateTranscript = (
+    id: string,
+    content: string,
+    summary: string,
+    i = summary
+  ) => {
+    console.log(
+      "🚀 ~ file: transcriptContext.tsx:122 ~ updateTranscript ~ i:",
+      i
+    );
+    console.log(
+      "🚀 ~ file: transcriptContext.tsx:122 ~ updateTranscript ~ content:",
+      content
+    );
+    console.log("🚀 ~ file: transcriptContext.tsx:126 ~ summary:", summary);
     db.transaction((tx) => {
       tx.executeSql(
-        `UPDATE ${transcriptTable} SET content = ? WHERE id = ?`,
-        [newContent, id],
+        `UPDATE ${transcriptTable} SET content = ?, summary = ? WHERE id = ?`,
+        [content, summary, id],
         (_, resultSet) => {
-          console.log("Successfully renamed transcript", id);
+          console.log("Successfully updated content and summary", id);
           if (resultSet.rowsAffected > 0) {
             let existingArr = [...transcripts];
             const index = existingArr.findIndex(
               (transcript) => transcript.id === id
             );
-            existingArr[index].content = newContent;
+            existingArr[index].content = content;
+            existingArr[index].summary = summary;
             setTranscripts(existingArr);
           }
         }
@@ -146,7 +161,7 @@ const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
         handleTranscribe,
         deleteTranscript,
         renameTranscript,
-        updateDocContent,
+        updateTranscript,
       }}
     >
       {children}
@@ -154,5 +169,4 @@ const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-const MemoizedTranscriptProvider = memo(TranscriptProvider);
-export { MemoizedTranscriptProvider as TranscriptProvider };
+export default TranscriptProvider;

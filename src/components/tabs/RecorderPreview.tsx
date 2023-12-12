@@ -51,6 +51,7 @@ const RecorderPreview = ({ recordPreview }: RecordPreviewProps) => {
       visible={isTransModalVisible}
       onRequestClose={hideTransModal}
       animationType="fade"
+      statusBarTranslucent
     >
       <View style={styles.background}>
         {isLoading ? (

@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: COLORS.primary,
     borderRadius: 8,
-    elevation: 3,
+    elevation: 1,
   },
   text: {
     ...globalStyles.fontSemiBold16,
