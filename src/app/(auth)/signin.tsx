@@ -20,7 +20,7 @@ import {
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
 import { Link, Stack } from "expo-router";
-import { handleSignIn, AuthProps } from "@utils/authFunc";
+import { handleSignIn } from "@utils/authFunc";
 
 const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -76,11 +76,11 @@ const SignIn = () => {
                 },
               }}
             />
-            <Link href="/forgotPassword" asChild>
+            {/* <Link href="/forgotPassword" asChild>
               <TouchableOpacity style={styles.forgotPwdView}>
                 <Text style={styles.forgotPwd}>Forgot password?</Text>
               </TouchableOpacity>
-            </Link>
+            </Link> */}
             <View style={{ alignItems: "center" }}>
               <CustomButton
                 title="Sign In"

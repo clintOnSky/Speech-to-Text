@@ -4,9 +4,6 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Modal,
 } from "react-native";
 import React, { useContext, useState } from "react";
 import { globalStyles } from "global/styles";
@@ -15,14 +12,11 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Link, Tabs } from "expo-router";
 import { RecordingContext } from "@context/recordingContext";
-import * as DocumentPicker from "expo-document-picker";
 import { AuthUserContext } from "@context/authContext";
 
 const Home = () => {
   const { showRecorder, saveAudio } = useContext(RecordingContext);
   const { currentUser } = useContext(AuthUserContext);
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // const getAudioFromStorage = async () => {
   //   try {

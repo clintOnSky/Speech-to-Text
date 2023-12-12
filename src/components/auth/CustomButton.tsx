@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
-import React, { FC, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { COLORS } from "@const/index";
 import { globalStyles } from "global/styles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";

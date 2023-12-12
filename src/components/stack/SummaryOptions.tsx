@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   FlatList,
   Modal,
   StyleSheet,
@@ -8,16 +7,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { COLORS } from "@const/index";
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
 import CustomButton from "../auth/CustomButton";
 import { summarizeDoc } from "@utils/summaryFunc";
-import { TranscriptContext } from "@context/transcriptContext";
 
 interface SummaryOptionsProps {
   hideModal: () => void;

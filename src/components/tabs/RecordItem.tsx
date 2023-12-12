@@ -21,7 +21,7 @@ import {
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
-import { MenuProps, PositionProps, RecordCardProps } from "types";
+import { PositionProps, RecordCardProps } from "types";
 import { Audio } from "expo-av";
 import { pause, play, resume } from "@utils/playbackFunc";
 import { PlaybackContext } from "@context/playbackContext";

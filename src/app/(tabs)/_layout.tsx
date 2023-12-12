@@ -4,7 +4,6 @@ import CustomBottomTab from "@comp/tabs/CustomBottomTab";
 import { COLORS, FONTS, SIZES } from "@const/index";
 import { globalStyles } from "global/styles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import PlaybackProvider from "@context/playbackContext";
 
 export default function TabLayout() {
   return (

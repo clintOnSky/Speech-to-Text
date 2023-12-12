@@ -6,7 +6,6 @@ import {
   View,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Modal,

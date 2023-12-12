@@ -12,25 +12,15 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import TranscriptItem from "@/components/tabs/TranscriptItem";
-import { recordData } from "@assets/dummyData";
 import { COLORS } from "@const/index";
 import { DatabaseContext } from "@context/database";
 import { TranscriptContext } from "@context/transcriptContext";
-import {
-  MenuProps,
-  PositionProps,
-  RecordCardProps,
-  TranscriptDataItem,
-} from "types";
-import { shareAsync } from "expo-sharing";
-import { shareFile } from "@utils/index";
+import { MenuProps, PositionProps, TranscriptDataItem } from "types";
 import { globalStyles } from "global/styles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import OptionsMenu from "@/components/tabs/OptionsMenu";
 import { ActivityIndicator } from "react-native";
 import { AuthUserContext } from "@context/authContext";
-import { set } from "react-hook-form";
-import axios from "axios";
 
 const Transcript = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -39,8 +29,6 @@ const Transcript = () => {
 
   const { transcripts, setTranscripts, deleteTranscript, renameTranscript } =
     useContext(TranscriptContext);
-
-  const { currentUser } = useContext(AuthUserContext);
 
   const [selectedTranscript, setSelectedTranscript] =
     useState<TranscriptDataItem>();
@@ -101,37 +89,6 @@ const Transcript = () => {
     setTitle(selectedTranscript.title);
     setIsModalVisible(true);
   };
-  // To be added
-  // const shareAudio = async () => {
-  //   shareFile(selectedTranscript.);
-  // };
-  // const dummyTranscripts = [
-  //   {
-  //     id: "1",
-  //     title: "Transcript 1",
-  //     createdAt: "2023-01-01T12:00:00Z",
-  //     content: "This is the content of transcript 1.",
-  //     summary: "Summary of transcript 1.",
-  //     audioId: "audio_1",
-  //   },
-  //   {
-  //     id: "2",
-  //     title: "Transcript 2",
-  //     createdAt: "2023-01-02T14:30:00Z",
-  //     content: "This is the content of transcript 2.",
-  //     summary: "Summary of transcript 2.",
-  //     audioId: "audio_2",
-  //   },
-  //   {
-  //     id: "3",
-  //     title: "Transcript 3",
-  //     createdAt: "2023-01-03T09:45:00Z",
-  //     content: "This is the content of transcript 3.",
-  //     summary: "Summary of transcript 3.",
-  //     audioId: "audio_3",
-  //   },
-  //   // Add more dummy data as needed
-  // ];
 
   const menuData: MenuProps[] = [
     { title: "Rename", handleMenuPress: showRenameModal },

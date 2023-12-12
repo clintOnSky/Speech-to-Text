@@ -1,5 +1,3 @@
-import { Audio } from "expo-av";
-
 export const getDuration = (timer: number) => {
   // Convert seconds to hours
   const hours = timer / 1000 / 60 / 60;

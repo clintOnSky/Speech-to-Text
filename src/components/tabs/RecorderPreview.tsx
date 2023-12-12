@@ -11,12 +11,10 @@ import { COLORS, SIZES } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
-import { getDateTime, getDuration } from "@utils/recordingFunc";
+import { getDuration } from "@utils/recordingFunc";
 import { RecordingContext } from "@context/recordingContext";
 import { RecordDataItem } from "types";
-import { transcribeAudio } from "@utils/transcribeFunc";
 import { TranscriptContext } from "@context/transcriptContext";
-import { router } from "expo-router";
 
 interface RecordPreviewProps {
   recordPreview: RecordDataItem;

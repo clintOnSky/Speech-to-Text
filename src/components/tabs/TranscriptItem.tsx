@@ -1,12 +1,5 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  TouchableWithoutFeedback,
-} from "react-native";
-import React, { useState, useRef, FC, useCallback } from "react";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import React, { useRef, FC, useCallback } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { COLORS, SIZES } from "@const/index";
 import {
@@ -14,13 +7,7 @@ import {
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
-import {
-  MenuProps,
-  PositionProps,
-  RecordCardProps,
-  TranscriptDataItem,
-} from "types";
-import OptionsMenu from "./OptionsMenu";
+import { MenuProps, PositionProps, TranscriptDataItem } from "types";
 import { router } from "expo-router";
 import { getDateTime } from "@utils/recordingFunc";
 

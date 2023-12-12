@@ -1,5 +1,4 @@
-import axios, { AxiosError } from "axios";
-import { Audio } from "expo-av";
+import axios from "axios";
 import { router } from "expo-router";
 import { Alert } from "react-native";
 

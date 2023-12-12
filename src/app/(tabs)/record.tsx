@@ -10,9 +10,8 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
-  Button,
 } from "react-native";
-import React, { useContext, useState, useEffect, useRef, memo } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import RecordItem from "@comp/tabs/RecordItem";
 import { COLORS, SIZES } from "@const/index";
 import CustomButton from "@comp/auth/CustomButton";
@@ -31,8 +30,6 @@ import {
 import OptionsMenu from "@/components/tabs/OptionsMenu";
 import { shareAsync } from "expo-sharing";
 import RecorderPreview from "@/components/tabs/RecorderPreview";
-import { AuthUserContext } from "@context/authContext";
-import { openDatabase } from "expo-sqlite";
 
 const Record = () => {
   const { db, recordingTable } = useContext(DatabaseContext);

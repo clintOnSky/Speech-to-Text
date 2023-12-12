@@ -1,5 +1,4 @@
 import { auth } from "config/firebase";
-import { Database } from "expo-sqlite";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
