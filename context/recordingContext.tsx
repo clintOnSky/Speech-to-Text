@@ -83,14 +83,14 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
           playsInSilentModeIOS: true,
         });
 
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY,
-          (status) => {
-            setTimer(status.durationMillis);
-          }
-        );
-
-        setRecording(recording);
+        const { recording: currentRecording } =
+          await Audio.Recording.createAsync(
+            Audio.RecordingOptionsPresets.HIGH_QUALITY,
+            (status) => {
+              setTimer(status.durationMillis);
+            }
+          );
+        setRecording(currentRecording);
         setIsRecording(true);
       } else {
         alert("Microphone permission access was denied");
@@ -98,19 +98,6 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err) {
       console.error("Failed to start recording", err);
     }
-  }
-
-  async function pauseRecording() {
-    console.log("Pausing recording..");
-    const status = await recording.pauseAsync();
-
-    setIsRecording(status.isRecording);
-  }
-
-  async function resumeRecording() {
-    console.log("Resuming recording..");
-    const record = await recording.startAsync();
-    setIsRecording(record.isRecording);
   }
 
   async function stopRecording() {
@@ -130,9 +117,23 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
     await saveAudio(uri);
   }
 
+  async function pauseRecording() {
+    console.log("Pausing recording..");
+    const status = await recording.pauseAsync();
+
+    setIsRecording(status.isRecording);
+  }
+
+  async function resumeRecording() {
+    console.log("Resuming recording..");
+    const record = await recording.startAsync();
+    setIsRecording(record.isRecording);
+  }
+
   const saveAudio = async (uri: string) => {
-    console.log("🚀 ~ file: recordingContext.tsx:134 ~ saveAudio ~ uri:", uri);
     const fileName = "AUD" + getCurrentISOString().replace(/[-T:Z.]/g, "");
+    const fileExtension = uri.split(".").pop();
+
     try {
       const internalDir = FileSystem.documentDirectory + "audio/";
 
@@ -145,7 +146,7 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       // Define the destination URI in internal storage
-      const internalFileUri = `${internalDir}${fileName}.m4a`;
+      const internalFileUri = `${internalDir}${fileName}.${fileExtension}`;
 
       await FileSystem.copyAsync({
         from: uri,

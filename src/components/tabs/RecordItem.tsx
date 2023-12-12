@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   soundIcon: {
     padding: 15,
-    backgroundColor: COLORS.lightBrown,
+    backgroundColor: COLORS.lightGreen,
     borderRadius: 8,
   },
   title: {

@@ -1,4 +1,4 @@
-import { AVPlaybackStatusSuccess, Audio } from "expo-av";
+import { Audio } from "expo-av";
 
 export const play = async (playbackObj: Audio.Sound, uri: string) => {
   try {
@@ -39,7 +39,6 @@ export const getAudioDuration = async (uri: string) => {
       sound.setOnPlaybackStatusUpdate((playbackStatus) => {
         if (playbackStatus.isLoaded) {
           const durationMillis = playbackStatus.durationMillis;
-          console.log("Is Loaded", durationMillis);
           resolve(durationMillis);
         }
       });

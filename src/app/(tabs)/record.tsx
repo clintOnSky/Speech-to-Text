@@ -110,7 +110,7 @@ const Record = () => {
     }
   };
 
-  const transcribeAudio = () => {
+  const handleTranscribeAudio = () => {
     hideMenu();
     console.log("Set", selectedRecord);
     showTransModal();
@@ -119,7 +119,7 @@ const Record = () => {
 
   const menuData: MenuProps[] = [
     { title: "Rename", handleMenuPress: showRenameModal },
-    { title: "Transcribe", handleMenuPress: transcribeAudio },
+    { title: "Transcribe", handleMenuPress: handleTranscribeAudio },
     { title: "Share", handleMenuPress: shareAudio },
     { title: "Delete", handleMenuPress: handleDelete },
   ];

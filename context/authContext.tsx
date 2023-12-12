@@ -29,10 +29,6 @@ const authUser = (
 // Ensures the user on accesses the app once they have been authenticated
 const useProtectedRoute = (currentUser: User) => {
   const segments = useSegments();
-  console.log(
-    "🚀 ~ file: authContext.tsx:32 ~ useProtectedRoute ~ segments:",
-    segments
-  );
 
   const inAuthRoute = segments[0] === "(auth)"; // Sets boolean to true if you are in an auth screen
 

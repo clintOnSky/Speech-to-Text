@@ -114,7 +114,7 @@ const SummaryOptions = ({
               />
               <View style={styles.summarizeBtn}>
                 <CustomButton
-                  title="Summarize"
+                  title="Explain"
                   onPress={() => {
                     handleSummary(selectedType, content);
                     setSelectedType("");

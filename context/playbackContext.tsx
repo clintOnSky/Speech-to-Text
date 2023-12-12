@@ -1,4 +1,5 @@
 import type { AVPlaybackStatusSuccess, Audio } from "expo-av";
+import { useSegments } from "expo-router";
 import { createContext, useState, useEffect, memo } from "react";
 import { PlaybackStatus } from "types";
 
@@ -20,6 +21,8 @@ const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
   const [sound, setSound] = useState<Audio.Sound>(null);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>(null);
   const [currentURI, setCurrentURI] = useState<string>("");
+  console.log("🚀 ~ file: playbackContext.tsx:24 ~ currentURI:", currentURI);
+  const segments = useSegments();
 
   useEffect(() => {
     sound?.setOnPlaybackStatusUpdate(
@@ -37,11 +40,13 @@ const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
     );
     return sound !== null
       ? () => {
+          console.log("Unloading sound");
           sound?.unloadAsync();
           setSound(null);
+          setPlaybackStatus(null);
         }
       : undefined;
-  }, [sound, currentURI]);
+  }, [sound, currentURI, segments]);
   return (
     <PlaybackContext.Provider
       value={{

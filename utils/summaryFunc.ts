@@ -70,7 +70,7 @@ export async function summarizeDoc(
       },
     });
     console.log("Summary function called");
-    const fullPrompt = `Can you ${summaryPrompt} of the following in a ${summaryType} shortly: ${prompt}?. \n Do not exceed the context of the given text`;
+    const fullPrompt = `Can you explain and ${summaryPrompt} of the following in a ${summaryType} shortly: ${prompt}?. \n Do not exceed the context of the given text`;
 
     const response = await client.post(url, {
       messages: [

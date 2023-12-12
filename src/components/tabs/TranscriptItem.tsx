@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   transcriptIcon: {
     padding: 15,
-    backgroundColor: COLORS.lightBrown,
+    backgroundColor: COLORS.lightGreen,
     borderRadius: 8,
   },
   title: {

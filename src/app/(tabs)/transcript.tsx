@@ -171,10 +171,6 @@ const Transcript = () => {
             null,
             (_, resultSet) => {
               setTranscripts(resultSet.rows._array);
-              console.log(
-                "🚀 ~ file: transcript.tsx:175 ~ db.transaction ~ resultSet.rows._array:",
-                resultSet.rows._array
-              );
               setIsLoading(false);
             },
             // @ts-ignore

@@ -126,12 +126,12 @@ const styles = StyleSheet.create({
     gap: 10,
     borderRadius: 8,
     width: "100%",
-    backgroundColor: COLORS.lightBrown,
+    backgroundColor: COLORS.lightGreen,
     marginBottom: 15,
   },
   recordIcon: {
     padding: 15,
-    backgroundColor: COLORS.lightBrown,
+    backgroundColor: COLORS.lightGreen,
     borderRadius: 8,
   },
   title: {

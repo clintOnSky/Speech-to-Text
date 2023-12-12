@@ -118,20 +118,7 @@ const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  const updateTranscript = (
-    id: string,
-    content: string,
-    summary: string,
-    i = summary
-  ) => {
-    console.log(
-      "🚀 ~ file: transcriptContext.tsx:122 ~ updateTranscript ~ i:",
-      i
-    );
-    console.log(
-      "🚀 ~ file: transcriptContext.tsx:122 ~ updateTranscript ~ content:",
-      content
-    );
+  const updateTranscript = (id: string, content: string, summary: string) => {
     console.log("🚀 ~ file: transcriptContext.tsx:126 ~ summary:", summary);
     db.transaction((tx) => {
       tx.executeSql(

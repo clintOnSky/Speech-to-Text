@@ -24,30 +24,32 @@ const Home = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const getAudioFromStorage = async () => {
-    try {
-      setIsLoading(true);
-      let result = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: true,
-        type: "audio/*",
-      });
-      if (!result.canceled) {
-        const file = result.assets[0];
-        if (file.size < 10000000) {
-          await saveAudio(file.uri);
-        } else {
-          Alert.alert(
-            "File size exceeded limits",
-            "Make sure the file is less than 10MB"
-          );
-        }
-      }
-      setIsLoading(false);
-    } catch (e) {
-      console.log(e);
-      setIsLoading(false);
-    }
-  };
+  // const getAudioFromStorage = async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     let result = await DocumentPicker.getDocumentAsync({
+  //       copyToCacheDirectory: true,
+  //       type: "audio/*",
+  //     });
+  //     if (!result.canceled) {
+  //       const file = result.assets[0];
+  //       if (file.size < 25000000) {
+  //         await saveAudio(file.uri);
+  //       } else {
+  //         Alert.alert(
+  //           "File size exceeded limits",
+  //           "Make sure the file is less than 10MB"
+  //         );
+  //       }
+  //     } else {
+  //       Alert.alert("Something went wrong");
+  //     }
+  //     setIsLoading(false);
+  //   } catch (e) {
+  //     console.log(e);
+  //     setIsLoading(false);
+  //   }
+  // };
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content}>
@@ -80,7 +82,7 @@ const Home = () => {
               </View>
             </TouchableOpacity>
           </Link>
-          <TouchableOpacity style={styles.button} onPress={getAudioFromStorage}>
+          {/* <TouchableOpacity style={styles.button} onPress={getAudioFromStorage}>
             <View style={styles.icon}>
               <Ionicons
                 name="musical-note-outline"
@@ -92,15 +94,15 @@ const Home = () => {
               <Text style={styles.buttonTitle}>Pick an audio file</Text>
               <Text style={styles.buttonDesc}>and Transcribe</Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </ScrollView>
 
-      <Modal visible={isLoading} transparent statusBarTranslucent>
+      {/* <Modal visible={isLoading} transparent statusBarTranslucent>
         <View style={styles.loadingView}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-      </Modal>
+      </Modal> */}
     </View>
   );
 };
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     padding: 10,
-    backgroundColor: COLORS.lightBrown,
+    backgroundColor: COLORS.lightGreen,
     borderRadius: 30,
   },
   buttonTitle: {

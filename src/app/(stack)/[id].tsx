@@ -31,20 +31,34 @@ import { globalStyles } from "global/styles";
 import CustomButton from "@/components/auth/CustomButton";
 import SummaryOptions from "@/components/stack/SummaryOptions";
 import { ActivityIndicator } from "react-native";
+import { PlaybackContext } from "@context/playbackContext";
+import { Audio } from "expo-av";
+import { pause, play, resume } from "@utils/playbackFunc";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { RecordDataItem, TranscriptDataItem } from "types";
 
 const Document = () => {
   const { id } = useLocalSearchParams();
 
-  const { db, transcriptTable } = useContext(DatabaseContext);
+  const { db, transcriptTable, recordingTable } = useContext(DatabaseContext);
   const { updateTranscript, transcripts } = useContext(TranscriptContext);
+  const {
+    sound,
+    setSound,
+    playbackStatus,
+    setPlaybackStatus,
+    currentURI,
+    setCurrentURI,
+  } = useContext(PlaybackContext);
 
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [content, setContent] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(false);
-  console.log("🚀 ~ file: [id].tsx:47 ~ Document ~ isLoading:", isLoading);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [audioId, setAudioId] = useState<string>("");
+  const [audioUri, setAudioUri] = useState<string>("");
 
   const [selectedType, setSelectedType] = useState("Full Text");
 
@@ -52,7 +66,7 @@ const Document = () => {
 
   const navigation = useNavigation();
 
-  const contentType = ["Full Text", "Summary"];
+  const contentType = ["Full Text", "Explanation"];
 
   useEffect(() => {
     db?.transaction((tx) => {
@@ -60,18 +74,31 @@ const Document = () => {
         `SELECT * FROM ${transcriptTable} WHERE id = ?`,
         [id.toString()],
         (_, resultSet) => {
-          const transcript = resultSet.rows._array[0];
+          const transcript: TranscriptDataItem = resultSet.rows._array[0];
           setTitle(transcript.title);
           setContent(transcript.content);
           setSummary(transcript.summary);
+          setAudioId(transcript.audioId);
+          tx.executeSql(
+            `SELECT * FROM ${recordingTable} WHERE id = ?`,
+            [transcript.audioId],
+            (_, resultSet) => {
+              const record: RecordDataItem = resultSet.rows._array[0];
+              setAudioUri(record.uri);
+            },
+            // @ts-ignore
+            (_, resultSet) => {
+              console.log("Error occured when getting recording", resultSet);
+            }
+          );
         },
+        // @ts-expect-error
         (_, resultSet) => {
           console.log("Error occured when getting transcript", resultSet);
-          return true;
         }
       );
     });
-  }, [id.toString(), transcripts]);
+  }, [id.toString(), transcripts, audioId]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -110,6 +137,7 @@ const Document = () => {
             onPress={() => {
               updateTranscript(id.toString(), content, summary);
               setIsEditable(false);
+              console.log(selectedType);
             }}
             style={styles.saveView}
           >
@@ -148,12 +176,37 @@ const Document = () => {
   const focusOnTextInput = () => {
     textInputRef.current?.focus();
   };
+
+  const handleAudio = useCallback(async () => {
+    setCurrentURI(audioUri);
+    try {
+      if (sound === null || currentURI !== audioUri) {
+        currentURI !== audioUri && (await sound?.unloadAsync());
+        const playbackObj = new Audio.Sound();
+        const status = await play(playbackObj, audioUri);
+        setSound(playbackObj);
+        setPlaybackStatus(status);
+      } else if (
+        playbackStatus.isLoaded &&
+        playbackStatus.isPlaying &&
+        currentURI === audioUri
+      ) {
+        const status = await pause(sound);
+        setPlaybackStatus(status);
+      } else if (playbackStatus.isLoaded && !playbackStatus.isPlaying) {
+        const status = await resume(sound);
+        setPlaybackStatus(status);
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  }, [playbackStatus, sound, audioUri]);
+
   return (
     <TouchableWithoutFeedback
       style={{ flex: 1 }}
       onPress={() => {
         focusOnTextInput();
-        console.log("called");
       }}
       disabled={!isEditable}
     >
@@ -250,21 +303,33 @@ const Document = () => {
               </Text>
             )}
           </ScrollView>
-          {!(selectedType === "Summary") && !isEditable && (
-            <View
-              style={{
-                paddingHorizontal: wp(SIZES.medium),
-                alignItems: "center",
-                justifyContent: "center",
-                position: "absolute",
-                bottom: 20,
-                left: 0,
-                right: 0,
-              }}
-            >
-              <CustomButton title="Summarize" onPress={showModal} />
-            </View>
-          )}
+          <View
+            style={{
+              paddingHorizontal: wp(SIZES.medium),
+              alignItems: "center",
+              justifyContent: "center",
+              position: "absolute",
+              bottom: 20,
+              left: 0,
+              right: 0,
+            }}
+          >
+            <TouchableOpacity onPress={handleAudio} style={styles.audioPlayer}>
+              <Ionicons
+                name={
+                  playbackStatus?.isLoaded && playbackStatus?.isPlaying
+                    ? "pause"
+                    : "play"
+                }
+                size={30}
+                color={COLORS.primary}
+                style={{ left: 1 }}
+              />
+            </TouchableOpacity>
+            {!(selectedType === "Explanation") && !isEditable && (
+              <CustomButton title="Get Explanation" onPress={showModal} />
+            )}
+          </View>
           <SummaryOptions
             content={content}
             isVisible={isVisible}
@@ -306,7 +371,7 @@ const styles = StyleSheet.create({
   },
   contentTypeBtn: {
     paddingVertical: 8,
-    width: wp(20),
+    width: wp(22),
     alignItems: "center",
     borderRadius: 16,
     backgroundColor: COLORS.white,
@@ -327,5 +392,14 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     ...globalStyles.fontBold16,
+  },
+  audioPlayer: {
+    borderWidth: 4,
+    borderColor: COLORS.primary,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    marginBottom: 20,
   },
 });

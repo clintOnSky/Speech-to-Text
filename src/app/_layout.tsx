@@ -37,9 +37,9 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthUserProvider>
-      <DatabaseProvider>
-        <PlaybackProvider>
+    <PlaybackProvider>
+      <AuthUserProvider>
+        <DatabaseProvider>
           <RecordingProvider>
             <TranscriptProvider>
               <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
@@ -91,8 +91,8 @@ export default function RootLayout() {
               </View>
             </TranscriptProvider>
           </RecordingProvider>
-        </PlaybackProvider>
-      </DatabaseProvider>
-    </AuthUserProvider>
+        </DatabaseProvider>
+      </AuthUserProvider>
+    </PlaybackProvider>
   );
 }

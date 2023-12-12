@@ -1,4 +1,11 @@
-import { Text, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Text,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Alert,
+} from "react-native";
 import React, { useEffect, useContext } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { COLORS, SIZES } from "@const/index";
@@ -6,6 +13,7 @@ import { globalStyles } from "global/styles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { RecordingContext } from "@context/recordingContext";
 import { getDuration } from "@utils/recordingFunc";
+import { getInfoAsync } from "expo-file-system";
 
 const AudioRecorder = () => {
   const {
@@ -24,6 +32,35 @@ const AudioRecorder = () => {
   useEffect(() => {
     clearStates();
   }, [isRecorderVisible]);
+
+  useEffect(() => {
+    const checkRecordingSize = async () => {
+      let recordingSize: number;
+      try {
+        if (recording) {
+          const fileInfo = await getInfoAsync(recording?.getURI());
+          if (fileInfo.exists) {
+            recordingSize = fileInfo.size;
+            console.log(
+              "🚀 ~ file: AudioRecorder.tsx:37 ~ checkRecordingSize ~ recordingSize:",
+              recordingSize
+            );
+          }
+
+          if (recordingSize >= 24999000) {
+            stopRecording();
+            Alert.alert(
+              "File size limit reached",
+              "The audio file has reached the 25MB size limit"
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Error checking recording size", error);
+      }
+    };
+    checkRecordingSize();
+  }, [timer]);
 
   return (
     <Modal
