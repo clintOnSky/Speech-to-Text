@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { COLORS } from "@const/index";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { globalStyles } from "global/styles";
@@ -33,9 +33,8 @@ const SummaryOptions = ({
   isVisible,
   setIsLoading,
 }: SummaryOptionsProps) => {
-  const [selectedType, setSelectedType] = useState<string>("");
-
   const summaryTypes = [
+    "Simple Summary",
     "Key Concepts",
     "Visual Summaries",
     "Bullet-point Lists",
@@ -44,6 +43,8 @@ const SummaryOptions = ({
     "Summary Paragraphs",
     "Application Examples",
   ];
+
+  const [selectedType, setSelectedType] = useState<string>(summaryTypes[0]);
 
   const handleSelected = (type: string) => {
     if (type === selectedType) {
@@ -68,59 +69,61 @@ const SummaryOptions = ({
       visible={isVisible}
       animationType="slide"
       statusBarTranslucent
+      onRequestClose={() => {
+        setSelectedType(summaryTypes[0]);
+        hideModal();
+      }}
     >
-      <TouchableWithoutFeedback onPress={hideModal}>
-        <View style={{ flex: 1 }}>
-          <View style={{ flex: 1, backgroundColor: COLORS.seeThrough }}>
-            <View style={styles.container}>
-              <Text style={styles.header}>Select the summary type</Text>
-              <FlatList
-                data={summaryTypes}
-                contentContainerStyle={styles.content}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[
-                      styles.summaryCard,
-                      {
-                        backgroundColor:
-                          selectedType === item
-                            ? COLORS.primary
-                            : "transparent",
-                      },
-                    ]}
-                    onPress={() => handleSelected(item)}
-                  >
-                    <Text
-                      style={[
-                        styles.cardText,
-                        {
-                          color:
-                            selectedType === item
-                              ? COLORS.white
-                              : COLORS.primary,
-                        },
-                      ]}
-                    >
-                      {item}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              />
-              <View style={styles.summarizeBtn}>
-                <CustomButton
-                  title="Explain"
-                  onPress={() => {
-                    handleSummary(selectedType, content);
-                    setSelectedType("");
-                    hideModal();
-                  }}
-                />
-              </View>
-            </View>
-          </View>
-        </View>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          setSelectedType(summaryTypes[0]);
+          hideModal();
+        }}
+      >
+        <View style={{ flex: 1, backgroundColor: COLORS.seeThrough }}></View>
       </TouchableWithoutFeedback>
+      <View style={styles.container}>
+        <Text style={styles.header}>Select the summary type</Text>
+        <FlatList
+          data={summaryTypes}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.summaryCard,
+                {
+                  backgroundColor:
+                    selectedType === item ? COLORS.primary : "transparent",
+                },
+              ]}
+              onPress={() => handleSelected(item)}
+            >
+              <Text
+                style={[
+                  styles.cardText,
+                  {
+                    color:
+                      selectedType === item ? COLORS.white : COLORS.primary,
+                  },
+                ]}
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+        <View style={styles.summarizeBtn}>
+          <CustomButton
+            title={selectedType === "" ? "Get Simple Summary" : "Done"}
+            onPress={() => {
+              handleSummary(selectedType, content);
+              setSelectedType("");
+              hideModal();
+            }}
+          />
+        </View>
+      </View>
     </Modal>
   );
 };
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
   content: {
     gap: 10,
     paddingTop: 20,
-    paddingBottom: hp(10),
+    paddingBottom: hp(12),
   },
   header: {
     ...globalStyles.fontBold20,

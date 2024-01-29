@@ -9,22 +9,6 @@ export async function transcribeAudio(
   const apiUrl = "https://api.openai.com/v1/audio/transcriptions";
   const openaiApiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
-  // const fileExtension = uri.split(".").pop();
-  // const mimeTypeMap = {
-  //   flac: "audio/flac",
-  //   m4a: "audio/mp4",
-  //   mp3: "audio/mpeg",
-  //   mp4: "audio/mp4",
-  //   mpeg: "audio/mpeg",
-  //   mpga: "audio/mpeg",
-  //   oga: "audio/ogg",
-  //   ogg: "audio/ogg",
-  //   wav: "audio/wav",
-  //   webm: "audio/webm",
-  // };
-
-  // const contentType = mimeTypeMap[fileExtension];
-  // console.log("🚀 ~ file: transcribeFunc.ts:26 ~ contentType:", contentType);
   try {
     const formData = new FormData();
     // @ts-ignore
@@ -34,6 +18,7 @@ export async function transcribeAudio(
       name: title,
     });
     formData.append("model", "whisper-1");
+    formData.append("language", "en");
     // formData.append("response_format", "text");
 
     const response = await axios.post(apiUrl, formData, {
@@ -42,9 +27,6 @@ export async function transcribeAudio(
         "Authorization": `Bearer ${openaiApiKey}`,
         "Content-Type": "multipart/form-data",
       },
-      // onUploadProgress: (progress) => {
-      //   console.log(progress.loaded);
-      // },
     });
     const responseData: { text: string } = response.data;
 

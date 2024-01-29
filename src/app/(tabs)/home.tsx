@@ -5,7 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { globalStyles } from "global/styles";
 import { COLORS, SIZES } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -15,35 +15,9 @@ import { RecordingContext } from "@context/recordingContext";
 import { AuthUserContext } from "@context/authContext";
 
 const Home = () => {
-  const { showRecorder, saveAudio } = useContext(RecordingContext);
+  const { showRecorder } = useContext(RecordingContext);
   const { currentUser } = useContext(AuthUserContext);
 
-  // const getAudioFromStorage = async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     let result = await DocumentPicker.getDocumentAsync({
-  //       copyToCacheDirectory: true,
-  //       type: "audio/*",
-  //     });
-  //     if (!result.canceled) {
-  //       const file = result.assets[0];
-  //       if (file.size < 25000000) {
-  //         await saveAudio(file.uri);
-  //       } else {
-  //         Alert.alert(
-  //           "File size exceeded limits",
-  //           "Make sure the file is less than 10MB"
-  //         );
-  //       }
-  //     } else {
-  //       Alert.alert("Something went wrong");
-  //     }
-  //     setIsLoading(false);
-  //   } catch (e) {
-  //     console.log(e);
-  //     setIsLoading(false);
-  //   }
-  // };
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content}>
@@ -76,27 +50,8 @@ const Home = () => {
               </View>
             </TouchableOpacity>
           </Link>
-          {/* <TouchableOpacity style={styles.button} onPress={getAudioFromStorage}>
-            <View style={styles.icon}>
-              <Ionicons
-                name="musical-note-outline"
-                size={30}
-                color={COLORS.primary}
-              />
-            </View>
-            <View style={{ gap: 5 }}>
-              <Text style={styles.buttonTitle}>Pick an audio file</Text>
-              <Text style={styles.buttonDesc}>and Transcribe</Text>
-            </View>
-          </TouchableOpacity> */}
         </View>
       </ScrollView>
-
-      {/* <Modal visible={isLoading} transparent statusBarTranslucent>
-        <View style={styles.loadingView}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
-      </Modal> */}
     </View>
   );
 };

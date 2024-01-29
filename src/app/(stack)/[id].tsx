@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  Alert,
+  BackHandler,
 } from "react-native";
 import React, {
   useCallback,
@@ -97,7 +99,19 @@ const Document = () => {
         }
       );
     });
-  }, [id.toString(), transcripts, audioId]);
+  }, [id.toString(), transcripts, audioId, isEditable]);
+
+  const handleOnBackPress = () => {
+    Alert.alert("Delete", "This audio will be deleted", [
+      { text: "Cancel", onPress: () => {} },
+      {
+        text: "Discard",
+        onPress: () => {
+          setIsEditable(false);
+        },
+      },
+    ]);
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -122,6 +136,24 @@ const Document = () => {
       headerTitleStyle: {
         ...globalStyles.fontBold20,
       },
+      headerBackVisible: false,
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => {
+            if (isEditable) {
+              // Do something specific when in editable mode
+              console.log("Custom back function for editable mode");
+              // Alert.alert("Warning", "Do you/ want to discard changes");
+              handleOnBackPress();
+            } else {
+              // Default behavior for non-editable mode
+              navigation.goBack();
+            }
+          }}
+        >
+          <MaterialIcons name="arrow-back" size={24} color={COLORS.black} />
+        </TouchableOpacity>
+      ),
       headerRight: () =>
         !isEditable ? (
           <TouchableOpacity
@@ -147,6 +179,27 @@ const Document = () => {
     // Focus the input and set the selection to the end when the component mounts
     focusOnTextInput();
   }, [content, summary, isEditable]);
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      if (isEditable) {
+        // Do something specific when in editable mode
+        handleOnBackPress();
+        return true; // Consume the back press event
+      } else {
+        // Default behavior for non-editable mode
+        return false; // Allow the default back press behavior
+      }
+    };
+
+    // Subscribe to the hardware back button event
+    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    // Cleanup when the component is unmounted
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+    };
+  }, [isEditable]);
 
   const showModal = () => {
     setIsVisible(true);
@@ -233,32 +286,62 @@ const Document = () => {
               justifyContent: "center",
             }}
           >
-            {!isEditable &&
-              contentType.map((type, index) => (
+            {!isEditable && (
+              <>
                 <TouchableOpacity
-                  key={index.toString()}
                   style={[
                     styles.contentTypeBtn,
                     {
                       backgroundColor:
-                        selectedType === type ? COLORS.primary : COLORS.white,
+                        selectedType === contentType[0]
+                          ? COLORS.primary
+                          : COLORS.white,
                     },
                   ]}
-                  onPress={() => setSelectedType(type)}
+                  onPress={() => setSelectedType(contentType[0])}
                 >
                   <Text
                     style={[
                       styles.contentTypeText,
                       {
                         color:
-                          selectedType === type ? COLORS.white : COLORS.primary,
+                          selectedType === contentType[0]
+                            ? COLORS.white
+                            : COLORS.primary,
                       },
                     ]}
                   >
-                    {type}
+                    {contentType[0]}
                   </Text>
                 </TouchableOpacity>
-              ))}
+                <TouchableOpacity
+                  style={[
+                    styles.contentTypeBtn,
+                    {
+                      backgroundColor:
+                        selectedType === contentType[1]
+                          ? COLORS.primary
+                          : COLORS.white,
+                    },
+                  ]}
+                  onPress={() => setSelectedType(contentType[1])}
+                >
+                  <Text
+                    style={[
+                      styles.contentTypeText,
+                      {
+                        color:
+                          selectedType === contentType[1]
+                            ? COLORS.white
+                            : COLORS.primary,
+                      },
+                    ]}
+                  >
+                    {contentType[1]}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
           <ScrollView
             style={{
@@ -370,7 +453,7 @@ const styles = StyleSheet.create({
   },
   contentTypeBtn: {
     paddingVertical: 8,
-    width: wp(22),
+    minWidth: wp(22),
     alignItems: "center",
     borderRadius: 16,
     backgroundColor: COLORS.white,
@@ -381,6 +464,7 @@ const styles = StyleSheet.create({
   contentTypeText: {
     ...globalStyles.fontBold14,
     color: COLORS.primary,
+    paddingHorizontal: 5,
   },
   saveView: {
     paddingHorizontal: 8,
@@ -395,6 +479,7 @@ const styles = StyleSheet.create({
   audioPlayer: {
     borderWidth: 4,
     borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",

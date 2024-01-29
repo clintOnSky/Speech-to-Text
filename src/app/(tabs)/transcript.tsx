@@ -20,7 +20,6 @@ import { globalStyles } from "global/styles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import OptionsMenu from "@/components/tabs/OptionsMenu";
 import { ActivityIndicator } from "react-native";
-import { AuthUserContext } from "@context/authContext";
 
 const Transcript = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);

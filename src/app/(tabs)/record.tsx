@@ -230,7 +230,6 @@ const Record = () => {
         transparent={true}
         visible={isMenuVisible}
         onRequestClose={hideMenu}
-        animationType="fade"
       >
         <TouchableWithoutFeedback onPressIn={hideMenu}>
           <View style={styles.modal}>

@@ -40,12 +40,20 @@ export const handleSignIn = async ({ email, password }: AuthProps) => {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
     console.log(user);
   } catch (error) {
-    if (error.message == "Firebase: Error (auth/wrong-password).") {
-      Alert.alert("", "Password is incorrect");
-    } else if (error.message === "Firebase: Error (auth/user-not-found).") {
-      Alert.alert("", "User does not exist");
-    } else {
-      console.log(error.message);
+    console.log("Error");
+    switch (error.message) {
+      case "Firebase: Error (auth/wrong-password).":
+        Alert.alert("", "Password is incorrect");
+        break;
+      case "Firebase: Error (auth/user-not-found).":
+        Alert.alert("", "User does not exist");
+        break;
+      case "Firebase: Error (auth/invalid-credential).":
+        Alert.alert("", "Wrong email or password");
+        break;
+      default:
+        Alert.alert("Error", error.message);
+        break;
     }
   }
 };
