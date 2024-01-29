@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
   },
   welcome: {
     ...globalStyles.fontSemiBold20,
+    width: "90%",
   },
   email: {
     ...globalStyles.fontBold20,
