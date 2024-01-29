@@ -17,11 +17,9 @@ export const PlaybackContext = createContext<PlaybackContextProps>(null);
 const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  console.log("Playback context called");
   const [sound, setSound] = useState<Audio.Sound>(null);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>(null);
   const [currentURI, setCurrentURI] = useState<string>("");
-  console.log("🚀 ~ file: playbackContext.tsx:24 ~ currentURI:", currentURI);
   const segments = useSegments();
 
   useEffect(() => {

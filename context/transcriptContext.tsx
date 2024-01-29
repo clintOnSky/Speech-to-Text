@@ -1,4 +1,3 @@
-import axios, { AxiosError } from "axios";
 import React, { createContext, memo, useContext, useState } from "react";
 import { RecordingContext } from "./recordingContext";
 import { getCurrentISOString } from "@utils/index";
@@ -13,7 +12,6 @@ export const TranscriptContext = createContext<TranscriptContenxtProps>(null);
 const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  console.log("Transcript called");
   const [transcripts, setTranscripts] = useState(null);
 
   const { db, transcriptTable } = useContext(DatabaseContext);
@@ -32,10 +30,6 @@ const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     const title = `DOC${getCurrentISOString().replace(/[-T:Z.]/g, "")}`;
     addTranscript(title, content);
-    console.log(
-      "🚀 ~ file: transcriptContext.tsx:34 ~ handleTranscribe ~ title:",
-      title
-    );
   };
 
   const addTranscript = (title: string, content: string) => {

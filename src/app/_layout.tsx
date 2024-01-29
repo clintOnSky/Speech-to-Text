@@ -87,6 +87,12 @@ export default function RootLayout() {
                       headerTitleAlign: "center",
                     }}
                   />
+                  <Stack.Screen
+                    name="(stack)/feedback"
+                    options={{
+                      headerShown: false,
+                    }}
+                  />
                 </Stack>
               </View>
             </TranscriptProvider>

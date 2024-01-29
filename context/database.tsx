@@ -15,7 +15,6 @@ const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { currentUser } = useContext(AuthUserContext);
-  console.log("Database context called");
   const db = SQLite.openDatabase("audioTranscript.db");
 
   const recordingTable = `recordings${currentUser?.uid}`;

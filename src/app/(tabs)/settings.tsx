@@ -2,17 +2,31 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import { COLORS } from "@const/index";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Octicons from "@expo/vector-icons/Octicons";
 import { globalStyles } from "global/styles";
 import { handleSignOut } from "@utils/authFunc";
+import { router } from "expo-router";
 
 const Settings = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Your Account</Text>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, gap: 5 }}>
         <TouchableOpacity style={styles.card} onPress={handleSignOut}>
           <Ionicons name="log-out-outline" size={24} color={COLORS.gray} />
           <Text style={styles.title}>Log out</Text>
+          <Ionicons name="chevron-forward" size={24} color={COLORS.gray} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => router.push("/feedback")}
+        >
+          <Ionicons
+            name="chatbox-ellipses-outline"
+            size={24}
+            color={COLORS.gray}
+          />
+          <Text style={styles.title}>Provide feedback</Text>
           <Ionicons name="chevron-forward" size={24} color={COLORS.gray} />
         </TouchableOpacity>
       </View>

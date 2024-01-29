@@ -15,7 +15,6 @@ export const RecordingContext = createContext<RecordingContextProps>(null);
 const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  console.log("Record context called");
   const { db, recordingTable } = useContext(DatabaseContext);
 
   // Stores actual recorded audio

@@ -94,22 +94,22 @@ const Transcript = () => {
     { title: "Delete", handleMenuPress: handleDelete },
   ];
 
-  useEffect(() => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "DROP TABLE IF EXISTS transcripts",
-        [],
-        (_, result) => {
-          console.log("Table deleted successfully");
-        },
-        (_, error) => {
-          console.error("Error deleting table:", error);
-          return true;
-        }
-      );
-    });
-    setIsLoading(false);
-  }, []);
+  // useEffect(() => {
+  //   db.transaction((tx) => {
+  //     tx.executeSql(
+  //       "DROP TABLE IF EXISTS transcripts",
+  //       [],
+  //       (_, result) => {
+  //         console.log("Table deleted successfully");
+  //       },
+  //       (_, error) => {
+  //         console.error("Error deleting table:", error);
+  //         return true;
+  //       }
+  //     );
+  //   });
+  //   setIsLoading(false);
+  // }, []);
 
   useEffect(() => {
     // Focus the input and set the selection to the end when the component mounts

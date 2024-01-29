@@ -30,7 +30,6 @@ const useProtectedRoute = (currentUser: User, checkedAuth: boolean) => {
 
   const navigate = useCallback(() => {
     if (checkedAuth) {
-      console.log("Im in");
       // If authentication is not successful and it is not in the auth route, it navigates to login
       if (!currentUser && !inAuthRoute) {
         router.replace("/signin");
@@ -53,7 +52,6 @@ const useProtectedRoute = (currentUser: User, checkedAuth: boolean) => {
 
 export const AuthUserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User>(null);
-  console.log("🚀 ~ AuthUserProvider ~ currentUser:", currentUser?.email);
   const [checkedAuth, setCheckedAuth] = useState<boolean>(false);
   authUser(currentUser, setCurrentUser, setCheckedAuth);
   useProtectedRoute(currentUser, checkedAuth);
