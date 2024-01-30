@@ -19,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#fafafa"
+        "backgroundColor": "#faf3ae"
       },
       "package": "com.clinton_sky.TransLect"
     },
