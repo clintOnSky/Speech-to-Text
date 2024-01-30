@@ -3,10 +3,24 @@
     "version": ">= 5.9.1"
   },
   "build": {
-    "public": {
+    "preview": {
       "android": {
         "buildType": "apk"
       },
+      "env": {
+        "EXPO_PUBLIC_OPENAI_API_KEY": "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",
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCvEiggTTqtfnme4x8iEUHUbQQn1NHgWwk",
+        "EXPO_PUBLIC_AUTH_DOMAIN": "speech-to-text-a3a27.firebaseapp.com",
+        "EXPO_PUBLIC_PROJECT_ID": "speech-to-text-a3a27",
+        "EXPO_PUBLIC_STORAGE_BUCKET": "speech-to-text-a3a27.appspot.com",
+        "EXPO_PUBLIC_MESSAGING_SENDER_ID": "685684584428",
+        "EXPO_PUBLIC_APPID": "1:685684584428:web:d609a6d0d3036cf5961ac9",
+        "EXPO_PUBLIC_MEASUREMENT_ID": "G-FNJX5EYBEN"
+      }
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_OPENAI_API_KEY": "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",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCvEiggTTqtfnme4x8iEUHUbQQn1NHgWwk",

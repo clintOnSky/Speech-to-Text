@@ -102,7 +102,7 @@ const Document = () => {
   }, [id.toString(), transcripts, audioId, isEditable]);
 
   const handleOnBackPress = () => {
-    Alert.alert("Delete", "This audio will be deleted", [
+    Alert.alert("Warning", "Are you sure you want to discard changes?", [
       { text: "Cancel", onPress: () => {} },
       {
         text: "Discard",
