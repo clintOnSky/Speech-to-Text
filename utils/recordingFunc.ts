@@ -24,7 +24,7 @@ export const getDuration = (timer: number) => {
 export function getDateTime(createdAt: string) {
   const dt = new Date(createdAt);
   const day = String(dt.getDate()).padStart(2, "0");
-  const month = String(dt.getMonth()).padStart(2, "0");
+  const month = String(dt.getMonth() + 1).padStart(2, "0");
   const year = String(dt.getFullYear());
 
   const hour = String(dt.getHours()).padStart(2, "0");

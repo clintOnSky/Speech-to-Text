@@ -70,35 +70,38 @@ const Document = () => {
   const contentType = ["Full Text", "Explanation"];
 
   useEffect(() => {
-    db?.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM ${transcriptTable} WHERE id = ?`,
-        [id.toString()],
-        (_, resultSet) => {
-          const transcript: TranscriptDataItem = resultSet.rows._array[0];
-          setTitle(transcript.title);
-          setContent(transcript.content);
-          setSummary(transcript.summary);
-          setAudioId(transcript.audioId);
-          tx.executeSql(
-            `SELECT * FROM ${recordingTable} WHERE id = ?`,
-            [transcript.audioId],
-            (_, resultSet) => {
-              const record: RecordDataItem = resultSet.rows._array[0];
-              setAudioUri(record.uri);
-            },
-            // @ts-ignore
-            (_, resultSet) => {
-              console.log("Error occured when getting recording", resultSet);
-            }
-          );
-        },
-        // @ts-expect-error
-        (_, resultSet) => {
-          console.log("Error occured when getting transcript", resultSet);
-        }
-      );
-    });
+    if (!isEditable) {
+      db?.transaction((tx) => {
+        tx.executeSql(
+          `SELECT * FROM ${transcriptTable} WHERE id = ?`,
+          [id.toString()],
+          (_, resultSet) => {
+            console.log("Called transaction");
+            const transcript: TranscriptDataItem = resultSet.rows._array[0];
+            setTitle(transcript.title);
+            setContent(transcript.content);
+            setSummary(transcript.summary);
+            setAudioId(transcript.audioId);
+            tx.executeSql(
+              `SELECT * FROM ${recordingTable} WHERE id = ?`,
+              [transcript.audioId],
+              (_, resultSet) => {
+                const record: RecordDataItem = resultSet.rows._array[0];
+                setAudioUri(record.uri);
+              },
+              // @ts-ignore
+              (_, resultSet) => {
+                console.log("Error occured when getting recording", resultSet);
+              }
+            );
+          },
+          // @ts-expect-error
+          (_, resultSet) => {
+            console.log("Error occured when getting transcript", resultSet);
+          }
+        );
+      });
+    }
   }, [id.toString(), transcripts, audioId, isEditable]);
 
   const handleOnBackPress = () => {
@@ -114,6 +117,9 @@ const Document = () => {
   };
 
   useEffect(() => {
+    if (summary === "") {
+      setSelectedType("Full Text");
+    }
     navigation.setOptions({
       title: title,
       headerTitle: () => (
@@ -272,21 +278,8 @@ const Document = () => {
             { backgroundColor: isEditable ? COLORS.lightBrown : COLORS.light },
           ]}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              position: "absolute",
-              top: 10,
-              left: 0,
-              right: 0,
-              zIndex: 1,
-              paddingVertical: 5,
-              gap: 15,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {!isEditable && (
+          <View style={styles.contentTypeView}>
+            {!isEditable && summary && (
               <>
                 <TouchableOpacity
                   style={[
@@ -349,7 +342,7 @@ const Document = () => {
             }}
             contentContainerStyle={[
               styles.content,
-              { paddingTop: isEditable ? 10 : 50 },
+              { paddingTop: isEditable || !summary ? 10 : 50 },
             ]}
             keyboardShouldPersistTaps="handled"
           >
@@ -385,17 +378,7 @@ const Document = () => {
               </Text>
             )}
           </ScrollView>
-          <View
-            style={{
-              paddingHorizontal: wp(SIZES.medium),
-              alignItems: "center",
-              justifyContent: "center",
-              position: "absolute",
-              bottom: 20,
-              left: 0,
-              right: 0,
-            }}
-          >
+          <View style={styles.audioBtnView}>
             <TouchableOpacity onPress={handleAudio} style={styles.audioPlayer}>
               <Ionicons
                 name={
@@ -409,7 +392,7 @@ const Document = () => {
               />
             </TouchableOpacity>
             {!(selectedType === "Explanation") && !isEditable && (
-              <CustomButton title="Get Explanation" onPress={showModal} />
+              <CustomButton title="Explain/Summarize" onPress={showModal} />
             )}
           </View>
           <SummaryOptions
@@ -423,15 +406,7 @@ const Document = () => {
           />
         </View>
         <Modal visible={isLoading} transparent statusBarTranslucent>
-          <View
-            style={{
-              flex: 1,
-              zIndex: 4,
-              backgroundColor: COLORS.seeThrough,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View style={styles.loading}>
             <ActivityIndicator size="large" color={COLORS.primary} />
           </View>
         </Modal>
@@ -450,6 +425,18 @@ const styles = StyleSheet.create({
   },
   content: {
     minHeight: hp(80),
+  },
+  contentTypeView: {
+    flexDirection: "row",
+    position: "absolute",
+    top: 10,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    paddingVertical: 5,
+    gap: 15,
+    alignItems: "center",
+    justifyContent: "center",
   },
   contentTypeBtn: {
     paddingVertical: 8,
@@ -472,9 +459,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
     borderRadius: 15,
+    backgroundColor: COLORS.seeThrough,
   },
   saveButton: {
     ...globalStyles.fontBold16,
+  },
+  audioBtnView: {
+    paddingHorizontal: wp(SIZES.medium),
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
   },
   audioPlayer: {
     borderWidth: 4,
@@ -485,5 +482,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10,
     marginBottom: 20,
+  },
+  loading: {
+    flex: 1,
+    zIndex: 4,
+    backgroundColor: COLORS.seeThrough,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

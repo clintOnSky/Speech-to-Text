@@ -26,12 +26,16 @@ export async function summarizeDoc(
   prompt: string,
   summaryType: string = "Simple Summary"
 ) {
+  console.log("🚀 ~ summaryType:", summaryType);
   const openaiApiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
   const url = "https://api.openai.com/v1/chat/completions";
 
   let summaryPrompt = "";
 
   switch (summaryType) {
+    case "Simple Summary":
+      summaryPrompt = "provide a simple summary";
+      break;
     case "Key Concepts":
       summaryPrompt = "summarize the key concepts";
       break;
@@ -47,14 +51,23 @@ export async function summarizeDoc(
     case "Highlight Important Details":
       summaryPrompt = "highlight important details";
       break;
-    case "Summary Paragraphs":
-      summaryPrompt = "write summary paragraphs";
-      break;
     case "Application Examples":
       summaryPrompt = "include real-world application examples";
       break;
-    case "Simple Summary":
-      summaryPrompt = "include real-world application examples";
+    case "Comparisons and Contrasts":
+      summaryPrompt = "compare and contrast the ideas";
+      break;
+    case "Cause and Effect":
+      summaryPrompt = "explain cause-and-effect relationships";
+      break;
+    case "Timeline or Chronology":
+      summaryPrompt = "present information in chronological order";
+      break;
+    case "Analogy":
+      summaryPrompt = "use analogies to explain complex ideas";
+      break;
+    case "Problem-Solving Scenarios":
+      summaryPrompt = "frame the content in problem-solving scenarios";
       break;
     default:
       summaryPrompt = "provide a simple summary";
@@ -69,7 +82,6 @@ export async function summarizeDoc(
         "Content-Type": "application/json",
       },
     });
-    console.log("Summary function called");
     const fullPrompt = `Can you explain and ${summaryPrompt} of the following in a ${summaryType} shortly: ${prompt}?. \n Do not exceed the context of the given text`;
 
     const response = await client.post(url, {

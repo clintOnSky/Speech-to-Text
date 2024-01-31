@@ -40,8 +40,12 @@ const SummaryOptions = ({
     "Bullet-point Lists",
     "Question and Answer Format",
     "Highlight Important Details",
-    "Summary Paragraphs",
     "Application Examples",
+    "Comparisons and Contrasts",
+    "Cause and Effect",
+    "Timeline or Chronology",
+    "Analogy",
+    "Problem-Solving Scenarios",
   ];
 
   const [selectedType, setSelectedType] = useState<string>(summaryTypes[0]);
@@ -58,7 +62,7 @@ const SummaryOptions = ({
     setIsLoading(true);
     const summaryResult = await summarizeDoc(prompt, selectedType);
     setSummary(summaryResult);
-    setSelectedContent("Summary");
+    setSelectedContent("Explanation");
     setIsLoading(false);
     setIsEditable(true);
   };
@@ -83,7 +87,7 @@ const SummaryOptions = ({
         <View style={{ flex: 1, backgroundColor: COLORS.seeThrough }}></View>
       </TouchableWithoutFeedback>
       <View style={styles.container}>
-        <Text style={styles.header}>Select the summary type</Text>
+        <Text style={styles.header}>Select your explanation type</Text>
         <FlatList
           data={summaryTypes}
           contentContainerStyle={styles.content}
