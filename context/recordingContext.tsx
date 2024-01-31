@@ -3,7 +3,7 @@ import React, { useState, createContext, useContext, memo } from "react";
 import { DatabaseContext } from "./database";
 import { PlaybackContext } from "./playbackContext";
 import { PermissionResponse, Recording } from "expo-av/build/Audio";
-import { Audio } from "expo-av";
+import { Audio, InterruptionModeAndroid } from "expo-av";
 import { getCurrentISOString } from "@utils/index";
 import * as FileSystem from "expo-file-system";
 import { RecordDataItem, RecordingContextProps } from "types";
@@ -78,8 +78,10 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
       if (permission.status === "granted") {
         console.log("Granted audio recording");
         await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true,
+          interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+          playThroughEarpieceAndroid: false,
+          staysActiveInBackground: true,
         });
 
         const { recording: currentRecording } =
@@ -104,7 +106,9 @@ const RecordingProvider: React.FC<{ children: React.ReactNode }> = ({
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
     await Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+      playThroughEarpieceAndroid: false,
     });
 
     const { sound } = await recording.createNewLoadedSoundAsync();

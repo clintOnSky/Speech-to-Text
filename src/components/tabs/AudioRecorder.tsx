@@ -74,6 +74,9 @@ const AudioRecorder = () => {
         <View style={styles.container}>
           <Text style={styles.title}>Record</Text>
           <View style={styles.timerView}>
+            <Text style={styles.warningText}>
+              Please do not turn off your display while recording
+            </Text>
             <Text style={styles.timer}>{getDuration(timer)}</Text>
           </View>
           <View style={styles.buttonView}>
@@ -130,9 +133,14 @@ const styles = StyleSheet.create({
     flex: 0.6,
     alignItems: "center",
     justifyContent: "center",
+    gap: 50,
+  },
+  warningText: {
+    ...globalStyles.fontSemiBold16,
+    width: "90%",
+    textAlign: "center",
   },
   timer: {
-    marginTop: 30,
     ...globalStyles.fontSemiBold36,
   },
   buttonView: {
