@@ -82,8 +82,9 @@ export async function summarizeDoc(
         "Content-Type": "application/json",
       },
     });
-    const fullPrompt = `Can you explain and ${summaryPrompt} of the following in a ${summaryType} shortly: ${prompt}?. \n Do not exceed the context of the given text`;
+    const fullPrompt = `Can you explain and ${summaryPrompt} of the following in a ${summaryType} format shortly: ${prompt}?. \n Do not exceed the context of the given text`;
 
+    console.log("🚀 ~ fullPrompt:", fullPrompt);
     const response = await client.post(url, {
       messages: [
         { role: "system", content: "You are a helpful assistant." },
